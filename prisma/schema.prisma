@@ -11,3 +11,19 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Pedido {
+  id         Int          @id @default(autoincrement())
+  numeroMesa Int
+  status     String       @default("Em Fila")
+  createdAt  DateTime     @default(now())
+  itens      ItemPedido[]
+}
+
+model ItemPedido {
+  id          Int     @id @default(autoincrement())
+  quantidade  Int
+  observacao  String?
+  pedidoId    Int
+  pedido      Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+}
