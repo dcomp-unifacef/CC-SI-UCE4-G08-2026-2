@@ -1,6 +1,6 @@
 Create DATABASE ChicDog
 
--- use ChicDog
+use ChicDog
 
 create TABLE tipoUsuario(
     idTipoUsuario int CONSTRAINT pk_IdTipoUsuario PRIMARY KEY IDENTITY(1,1),

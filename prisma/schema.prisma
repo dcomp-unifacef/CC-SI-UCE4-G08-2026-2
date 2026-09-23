@@ -3,27 +3,90 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+datasource db {
+  provider = "sqlserver"
+  
 }
 
-datasource db {
-  provider = "postgresql"
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TipoUsuario {
+  idTipoUsuario Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(50)
+  usuarios      Usuario[] @relation("TipoUsuarioToUsuario")
+
+  @@map("tipoUsuario")
+}
+
+model Usuario {
+  idUsuario     Int         @id @default(autoincrement())
+  nome          String      @db.VarChar(80)
+  loginUsuario  String      @unique(map: "unq_login") @db.VarChar(80)
+  senha         String      @db.VarChar(255)
+  statusUsuario Boolean     // O tipo BIT do SQL Server vira Boolean no Prisma
+  idTipoUsuario Int
+  
+  tipoUsuario   TipoUsuario @relation("TipoUsuarioToUsuario", fields: [idTipoUsuario], references: [idTipoUsuario], onUpdate: NoAction)
+  
+  // Relacionamentos reversos para a tabela de pedidos
+  pedidosCliente Pedido[]   @relation("ClienteToPedido")
+  pedidosGarcom  Pedido[]   @relation("GarcomToPedido")
+
+  @@map("usuario")
 }
 
 model Pedido {
-  id         Int          @id @default(autoincrement())
-  numeroMesa Int
-  status     String       @default("Em Fila")
-  createdAt  DateTime     @default(now())
-  itens      ItemPedido[]
+  idPedido     Int         @id @default(autoincrement())
+  valorTotal   Decimal     @db.Decimal(10, 2)
+  dataHora     DateTime    @default(now()) @db.DateTime2
+  statusPedido String      @db.VarChar(80) // Restrição CHECK de strings é validada na aplicação ou banco
+  idCliente    Int
+  idGarcom     Int
+
+  cliente      Usuario     @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
+  garcom       Usuario     @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
+  
+  pagamento    Pagamento?  // Relação 1:1 opcional (o pagamento aponta para o pedido)
+  itens        ItemPedido[]
+
+  @@map("pedido")
+}
+
+model Pagamento {
+  idPagamento    Int      @id @default(autoincrement())
+  valor          Decimal  @db.Decimal(10, 2)
+  dataHora       DateTime @default(now()) @db.DateTime2
+  formaPagamento String   @db.VarChar(80)
+  idPedido       Int      @unique(map: "unq_pagamento_pedido") // Garante a relação 1:1
+
+  pedido         Pedido   @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
+
+  @@map("pagamento")
+}
+
+model Produto {
+  idProduto   Int          @id @default(autoincrement())
+  nome        String       @db.VarChar(80)
+  preco       Decimal      @db.Decimal(10, 2)
+  descricao   String       @db.VarChar(100)
+  disponivel  Boolean      @default(true) // DEFAULT(1) mapeado para true
+  itensPedido ItemPedido[]
+
+  @@map("produto")
 }
 
 model ItemPedido {
-  id          Int     @id @default(autoincrement())
-  quantidade  Int
-  observacao  String?
-  pedidoId    Int
-  pedido      Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  idItemPedido Int     @id @default(autoincrement())
+  subTotal     Decimal @db.Decimal(10, 2)
+  quantidade   Int
+  valorUnit    Decimal @db.Decimal(10, 2)
+  idProduto    Int
+  idPedido     Int
+
+  produto      Produto @relation(fields: [idProduto], references: [idProduto], onUpdate: NoAction)
+  pedido       Pedido  @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
+
+  @@map("itemPedido")
 }
