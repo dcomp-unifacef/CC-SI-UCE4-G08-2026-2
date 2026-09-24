@@ -1,5 +1,7 @@
 ﻿import repository from "../repositories/tipoUsuarioRepository";
 import { AppError } from "../errors/AppError";
+import { CreateTipoUsuarioDto } from "../dto/tipoUsuario/createTipoUsuarioDto";
+import { UpdateTipoUsuarioDto } from "../dto/tipoUsuario/updateTipoUsuarioDto";
 
 function validarNome(nome: unknown): asserts nome is string {
   if (typeof nome !== "string" || nome.trim().length === 0) {
@@ -20,13 +22,15 @@ async function findById(id: number) {
   return tipoUsuario;
 }
 
-async function create(nome: unknown) {
+async function create(data: CreateTipoUsuarioDto) {
+  const nome = data?.nome;
   validarNome(nome);
   return repository.create(nome.trim());
 }
 
-async function update(id: number, nome: unknown) {
+async function update(id: number, data: UpdateTipoUsuarioDto) {
   await findById(id);
+  const nome = data?.nome;
   validarNome(nome);
   return repository.update(id, nome.trim());
 }

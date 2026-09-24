@@ -344,3 +344,16 @@ O estado de migração foi consultado fora do sandbox. A verificação TLS da fe
 ### Auditoria de dependências
 
 `npm audit --omit=dev` reportou 4 alertas de severidade alta no grafo de dependências (`deepmerge-ts` e `mysql2`, trazidos por dependências Prisma/configuração). A correção automática sugerida exige `npm audit fix --force` e rebaixaria `prisma` para 6.19.3, incompatível com o adapter SQL Server configurado para Prisma 7. Não apliquei esse downgrade; exige uma migração planejada de versões e nova bateria de testes.
+
+---
+
+## 14. DTOs de `TipoUsuario`
+
+Foram criados dois arquivos para documentar os formatos aceitos pela API:
+
+- `Back-End/src/dto/tipoUsuario/createTipoUsuarioDto.ts`: exporta `CreateTipoUsuarioDto`, com `nome: string`, porque o nome é necessário para criar um tipo.
+- `Back-End/src/dto/tipoUsuario/updateTipoUsuarioDto.ts`: exporta `UpdateTipoUsuarioDto`, com `nome?: string`, representando uma atualização parcial. Como `nome` é o único campo editável por enquanto, o service ainda rejeita atualização sem um nome válido.
+- `tipoUsuarioController.ts` importa os dois DTOs e tipa o corpo da criação e atualização antes de encaminhá-lo ao service. Esse cast ajuda o TypeScript, mas não substitui validação real.
+- `tipoUsuarioService.ts` recebe os DTOs como tipos de entrada, extrai `nome` e mantém validação em tempo de execução: exige texto não vazio e limita o nome a 50 caracteres, conforme a coluna do banco.
+
+A compilação `tsc --noEmit` passou depois dessa integração.
