@@ -1,13 +1,17 @@
-require("dotenv/config");
-const { PrismaClient } = require("@prisma/client");
+﻿import "dotenv/config";
+import { PrismaMssql } from "@prisma/adapter-mssql";
+import { PrismaClient } from "@prisma/client";
 
 const connectionString = process.env.DATABASE_URL;
-
 if (!connectionString) {
   throw new Error("A variável DATABASE_URL não foi definida no arquivo .env");
 }
 
-const prisma = new PrismaClient({
+// Prisma 7 exige um driver adapter; este projeto usa SQL Server.
+const adapter = new PrismaMssql(connectionString);
+
+export const prisma = new PrismaClient({
+  adapter,
   log: [
     { emit: "event", level: "query" },
     { emit: "stdout", level: "error" },
@@ -16,13 +20,10 @@ const prisma = new PrismaClient({
   ],
 });
 
-// Exibe todas as instruções SQL geradas pelo Prisma no terminal do VS Code
-prisma.$on("query", (e: any) => {
+// Exibe no terminal as consultas geradas pelo Prisma durante o desenvolvimento.
+prisma.$on("query", (event) => {
   console.log("---");
-  console.log("Query: " + e.query);
-  console.log("Params: " + e.params);
-  console.log("Duration: " + e.duration + "ms");
+  console.log("Query: " + event.query);
+  console.log("Params: " + event.params);
+  console.log("Duration: " + event.duration + "ms");
 });
-
-module.exports = { prisma };
-export { prisma };

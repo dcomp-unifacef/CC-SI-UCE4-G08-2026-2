@@ -1,4 +1,4 @@
-export interface UpdateUsuarioDto {
+﻿export interface UpdateUsuarioDto {
   nome?: string;
   loginUsuario?: string;
   senha?: string;

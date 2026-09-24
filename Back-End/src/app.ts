@@ -1,13 +1,24 @@
-const express = require("express");
-const usuariosRouter = require("./routes/usuarios");
+﻿const express = require("express");
+const tipoUsuariosRouter = require("./routes/tipoUsuarios");
+// usuarios.ts exporta o router como default, então o CommonJS expõe .default.
+const usuariosRouter = require("./routes/usuarios").default;
+const { AppError } = require("./errors/AppError");
 
 const app = express();
-
 app.use(express.json());
-
+app.use("/tipo-usuarios", tipoUsuariosRouter);
 app.use("/usuarios", usuariosRouter);
 
-const PORT = 3000;
+// Converte AppError em resposta HTTP com seu status; erros inesperados ficam como 500.
+app.use((error: any, _req: any, res: any, _next: any) => {
+  if (error instanceof AppError) {
+    return res.status(error.statusCode).json({ erro: error.message });
+  }
+  console.error(error);
+  return res.status(500).json({ erro: "Erro interno do servidor." });
+});
+
+const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando com sucesso na porta ${PORT}`);
 });
