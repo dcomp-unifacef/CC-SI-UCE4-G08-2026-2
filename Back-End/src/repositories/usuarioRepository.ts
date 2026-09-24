@@ -39,7 +39,7 @@ function remove(idUsuario: number) {
   });
 }
 
-module.exports = {
+export default {
   findAll,
   findById,
   findByLogin,
@@ -47,3 +47,4 @@ module.exports = {
   update,
   remove,
 };
+

@@ -1,15 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "sqlserver"
-  
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model TipoUsuario {
@@ -21,35 +15,30 @@ model TipoUsuario {
 }
 
 model Usuario {
-  idUsuario     Int         @id @default(autoincrement())
-  nome          String      @db.VarChar(80)
-  loginUsuario  String      @unique(map: "unq_login") @db.VarChar(80)
-  senha         String      @db.VarChar(255)
-  statusUsuario Boolean     // O tipo BIT do SQL Server vira Boolean no Prisma
-  idTipoUsuario Int
-  
-  tipoUsuario   TipoUsuario @relation("TipoUsuarioToUsuario", fields: [idTipoUsuario], references: [idTipoUsuario], onUpdate: NoAction)
-  
-  // Relacionamentos reversos para a tabela de pedidos
-  pedidosCliente Pedido[]   @relation("ClienteToPedido")
-  pedidosGarcom  Pedido[]   @relation("GarcomToPedido")
+  idUsuario      Int         @id @default(autoincrement())
+  nome           String      @db.VarChar(80)
+  loginUsuario   String      @unique(map: "unq_login") @db.VarChar(80)
+  senha          String      @db.VarChar(255)
+  statusUsuario  Boolean
+  idTipoUsuario  Int
+  pedidosCliente Pedido[]    @relation("ClienteToPedido")
+  pedidosGarcom  Pedido[]    @relation("GarcomToPedido")
+  tipoUsuario    TipoUsuario @relation("TipoUsuarioToUsuario", fields: [idTipoUsuario], references: [idTipoUsuario], onUpdate: NoAction)
 
   @@map("usuario")
 }
 
 model Pedido {
-  idPedido     Int         @id @default(autoincrement())
-  valorTotal   Decimal     @db.Decimal(10, 2)
-  dataHora     DateTime    @default(now()) @db.DateTime2
-  statusPedido String      @db.VarChar(80) // Restrição CHECK de strings é validada na aplicação ou banco
+  idPedido     Int          @id @default(autoincrement())
+  valorTotal   Decimal      @db.Decimal(10, 2)
+  dataHora     DateTime     @default(now())
+  statusPedido String       @db.VarChar(80)
   idCliente    Int
   idGarcom     Int
-
-  cliente      Usuario     @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
-  garcom       Usuario     @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
-  
-  pagamento    Pagamento?  // Relação 1:1 opcional (o pagamento aponta para o pedido)
   itens        ItemPedido[]
+  pagamento    Pagamento?
+  cliente      Usuario      @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
+  garcom       Usuario      @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
 
   @@map("pedido")
 }
@@ -57,10 +46,9 @@ model Pedido {
 model Pagamento {
   idPagamento    Int      @id @default(autoincrement())
   valor          Decimal  @db.Decimal(10, 2)
-  dataHora       DateTime @default(now()) @db.DateTime2
+  dataHora       DateTime @default(now())
   formaPagamento String   @db.VarChar(80)
-  idPedido       Int      @unique(map: "unq_pagamento_pedido") // Garante a relação 1:1
-
+  idPedido       Int      @unique(map: "unq_pagamento_pedido")
   pedido         Pedido   @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
 
   @@map("pagamento")
@@ -71,7 +59,7 @@ model Produto {
   nome        String       @db.VarChar(80)
   preco       Decimal      @db.Decimal(10, 2)
   descricao   String       @db.VarChar(100)
-  disponivel  Boolean      @default(true) // DEFAULT(1) mapeado para true
+  disponivel  Boolean      @default(true)
   itensPedido ItemPedido[]
 
   @@map("produto")
@@ -84,9 +72,8 @@ model ItemPedido {
   valorUnit    Decimal @db.Decimal(10, 2)
   idProduto    Int
   idPedido     Int
-
-  produto      Produto @relation(fields: [idProduto], references: [idProduto], onUpdate: NoAction)
   pedido       Pedido  @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
+  produto      Produto @relation(fields: [idProduto], references: [idProduto], onUpdate: NoAction)
 
   @@map("itemPedido")
 }

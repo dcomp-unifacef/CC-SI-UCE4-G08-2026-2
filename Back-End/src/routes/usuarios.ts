@@ -1,5 +1,7 @@
-const { Router } = require("express");
-const controller = require("../controllers/usuarioController");
+// back-end/src/routes/users.ts
+import { Router } from "express";
+import * as controller from "../controllers/usuarioController";
+import * as authController from "../controllers/authController";
 
 const router = Router();
 
@@ -9,4 +11,6 @@ router.post("/", controller.create);
 router.put("/:id", controller.update);
 router.delete("/:id", controller.remove);
 
-module.exports = router;
+router.post("/login", authController.login);
+
+export default router;

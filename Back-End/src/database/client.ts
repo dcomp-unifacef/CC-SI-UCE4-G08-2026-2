@@ -25,3 +25,4 @@ prisma.$on("query", (e: any) => {
 });
 
 module.exports = { prisma };
+export { prisma };

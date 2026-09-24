@@ -10,3 +10,22 @@ services:
       - MSSQL_SA_PASSWORD=pass3006!
 
   
+  app:
+    build: .
+    container_name: chicdog_backend
+    ports:
+      - "3333:3333" # Porta onde sua API Express vai rodar para o mundo externo
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DATABASE_URL=sqlserver://database:1433;database=ChicDog;user=sa;password=pass3006!;encrypt=true;trustServerCertificate=true;
+      - PORT=3333
+    depends_on:
+      - database
+    networks:
+      - chicdog-network
+
+networks:
+  chicdog-network:
+    driver: bridge
