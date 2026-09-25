@@ -341,9 +341,13 @@ O projeto foi convertido de SQL Server para PostgreSQL para seguir o padrão uti
 - `docker compose ps`: serviço `chicdog_postgres` reportado como `healthy`.
 - `npx prisma migrate dev --name init`: nova migration PostgreSQL gerada.
 - `npx prisma generate`: Prisma Client regenerado para a configuração atual.
-- `npm run dev` ainda não foi executado nesta etapa; o teste HTTP dos endpoints fica para a próxima validação.
+- `npm run dev`: aplicação iniciada com o PostgreSQL em execução.
+- Teste HTTP do CRUD de `Produto`: criação, listagem, busca por ID, atualização parcial e exclusão executados com sucesso.
+- Teste de ID inválido em `GET /produtos/abc`: retorno de `AppError` com status `400` e mensagem `O id deve ser um inteiro positivo.`
+- Teste de produto inexistente na exclusão: retorno de `AppError` com status `404` e mensagem `Produto não encontrado.`
+- O middleware global converteu corretamente os `AppError` em respostas JSON no formato `{"erro": "..."}`.
 
-A auditoria de dependências será revisada novamente depois que a API for executada com o PostgreSQL.
+A auditoria de dependências continua sendo revisada separadamente.
 
 ---
 
@@ -410,4 +414,4 @@ A entrega atual possui três módulos de API funcionando:
 
 O schema também possui as entidades `Pedido`, `Pagamento` e `ItemPedido`, mas elas ainda não possuem controllers, services ou repositories próprios. A conversão do banco para PostgreSQL foi concluída e a migration ativa está em `prisma/migrations/20260925202218_init/migration.sql`.
 
-Ainda falta executar a validação final da API com `npm run dev` e testar os endpoints com o PostgreSQL em execução.
+A validação final da API foi concluída com o PostgreSQL em execução. Os endpoints do módulo `Produto` foram testados com sucesso, incluindo as respostas de erro para ID inválido e produto inexistente.
