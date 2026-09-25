@@ -1,54 +1,90 @@
-Create DATABASE ChicDog
+-- CreateTable
+CREATE TABLE "tipoUsuario" (
+    "idTipoUsuario" SERIAL NOT NULL,
+    "nome" VARCHAR(50) NOT NULL,
 
-use ChicDog
+    CONSTRAINT "tipoUsuario_pkey" PRIMARY KEY ("idTipoUsuario")
+);
 
-create TABLE tipoUsuario(
-    idTipoUsuario int CONSTRAINT pk_IdTipoUsuario PRIMARY KEY IDENTITY(1,1),
-    nome VARCHAR(50) NOT NULL
-)
+-- CreateTable
+CREATE TABLE "usuario" (
+    "idUsuario" SERIAL NOT NULL,
+    "nome" VARCHAR(80) NOT NULL,
+    "loginUsuario" VARCHAR(80) NOT NULL,
+    "senha" VARCHAR(255) NOT NULL,
+    "statusUsuario" BOOLEAN NOT NULL,
+    "idTipoUsuario" INTEGER NOT NULL,
 
-CREATE TABLE usuario(
-    idUsuario int CONSTRAINT pk_idUsuario PRIMARY KEY IDENTITY(1,1),
-    nome VARCHAR(80) NOT NULL,
-    loginUsuario VARCHAR(80) CONSTRAINT unq_login UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL,
-    statusUsuario BIT NOT NULL, -- bit é "o tipo booleano " de sql Server
-    idTipoUsuario INT CONSTRAINT fk_idTipoUsuario FOREIGN KEY REFERENCES tipoUsuario(idTipoUsuario) NOT NULL
+    CONSTRAINT "usuario_pkey" PRIMARY KEY ("idUsuario")
+);
 
-)
+-- CreateTable
+CREATE TABLE "pedido" (
+    "idPedido" SERIAL NOT NULL,
+    "valorTotal" DECIMAL(10,2) NOT NULL,
+    "dataHora" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "statusPedido" VARCHAR(80) NOT NULL,
+    "idCliente" INTEGER NOT NULL,
+    "idGarcom" INTEGER NOT NULL,
 
-CREATE TABLE pedido(
-    idPedido int CONSTRAINT pk_idPedido PRIMARY KEY IDENTITY(1,1),
-    valorTotal DECIMAL(10,2) NOT NULL,
-    dataHora DATETIME2 NOT NULL DEFAULT GETDATE(),
-    statusPedido VARCHAR(80) CONSTRAINT chk_statusPedido check(statusPedido in('PENDENTE', 'EM PREPARO', 'PRONTO', 'ENTREGUE', 'CANCELADO')) not NULL,
-    idCliente int NOT NULL CONSTRAINT fk_idCliente FOREIGN KEY REFERENCES usuario(idUsuario),
-    idGarcom int NOT NULL CONSTRAINT fk_idGarcom FOREIGN KEY REFERENCES usuario(idUsuario)
-)
+    CONSTRAINT "pedido_pkey" PRIMARY KEY ("idPedido")
+);
 
-CREATE TABLE pagamento(
-    idPagamento int CONSTRAINT pk_idPagamento PRIMARY KEY IDENTITY(1,1),
-    valor DECIMAL(10,2) NOT NULL,
-    dataHora DATETIME2 NOT NULL DEFAULT GETDATE(),
-    formaPagamento VARCHAR(80) NOT NULL,
-    idPedido int NOT NULL CONSTRAINT fk_idPedido REFERENCES pedido(idPedido),
-    CONSTRAINT unq_pagamento_pedido UNIQUE (idPedido)
-)
+-- CreateTable
+CREATE TABLE "pagamento" (
+    "idPagamento" SERIAL NOT NULL,
+    "valor" DECIMAL(10,2) NOT NULL,
+    "dataHora" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "formaPagamento" VARCHAR(80) NOT NULL,
+    "idPedido" INTEGER NOT NULL,
 
-CREATE TABLE produto(
-    idProduto int CONSTRAINT pk_idProduto PRIMARY KEY IDENTITY(1,1),
-    nome VARCHAR(80) NOT NULL,
-    preco DECIMAL(10,2) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    disponivel bit NOT NULL CONSTRAINT df_disponivel DEFAULT(1)
-)
+    CONSTRAINT "pagamento_pkey" PRIMARY KEY ("idPagamento")
+);
 
-CREATE TABLE itemPedido(
-    idItemPedido int CONSTRAINT pk_idItemPedido PRIMARY KEY IDENTITY(1,1),
-    subTotal DECIMAL(10,2) NOT NULL,
-    quantidade int NOT NULL CONSTRAINT chk_qntItemPedido CHECK(quantidade > 0),
-    valorUnit DECIMAL(10,2) NOT NULL,
-    idProduto int CONSTRAINT fk_idProduto REFERENCES produto(idProduto) NOT NULL,
-    idPedido int CONSTRAINT fk_idPedido_itemPedido REFERENCES pedido(idPedido) NOT NULL 
-)
+-- CreateTable
+CREATE TABLE "produto" (
+    "idProduto" SERIAL NOT NULL,
+    "nome" VARCHAR(80) NOT NULL,
+    "preco" DECIMAL(10,2) NOT NULL,
+    "descricao" VARCHAR(100) NOT NULL,
+    "disponivel" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "produto_pkey" PRIMARY KEY ("idProduto")
+);
+
+-- CreateTable
+CREATE TABLE "itemPedido" (
+    "idItemPedido" SERIAL NOT NULL,
+    "subTotal" DECIMAL(10,2) NOT NULL,
+    "quantidade" INTEGER NOT NULL,
+    "valorUnit" DECIMAL(10,2) NOT NULL,
+    "idProduto" INTEGER NOT NULL,
+    "idPedido" INTEGER NOT NULL,
+
+    CONSTRAINT "itemPedido_pkey" PRIMARY KEY ("idItemPedido")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "unq_login" ON "usuario"("loginUsuario");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "unq_pagamento_pedido" ON "pagamento"("idPedido");
+
+-- AddForeignKey
+ALTER TABLE "usuario" ADD CONSTRAINT "usuario_idTipoUsuario_fkey" FOREIGN KEY ("idTipoUsuario") REFERENCES "tipoUsuario"("idTipoUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "pedido" ADD CONSTRAINT "pedido_idCliente_fkey" FOREIGN KEY ("idCliente") REFERENCES "usuario"("idUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "pedido" ADD CONSTRAINT "pedido_idGarcom_fkey" FOREIGN KEY ("idGarcom") REFERENCES "usuario"("idUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "pagamento" ADD CONSTRAINT "pagamento_idPedido_fkey" FOREIGN KEY ("idPedido") REFERENCES "pedido"("idPedido") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "itemPedido" ADD CONSTRAINT "itemPedido_idPedido_fkey" FOREIGN KEY ("idPedido") REFERENCES "pedido"("idPedido") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "itemPedido" ADD CONSTRAINT "itemPedido_idProduto_fkey" FOREIGN KEY ("idProduto") REFERENCES "produto"("idProduto") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
