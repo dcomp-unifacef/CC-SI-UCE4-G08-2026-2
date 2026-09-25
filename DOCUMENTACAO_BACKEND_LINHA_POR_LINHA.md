@@ -318,32 +318,32 @@ A verificação `tsc --noEmit` passou depois dessas alterações. Não foi feita
 
 ---
 
-## 13. Correção encontrada durante os testes: conexão Prisma com SQL Server
+## 13. Conexão Prisma com PostgreSQL
 
-Ao tentar conectar o backend, o Prisma 7 falhou antes de executar qualquer endpoint porque `PrismaClient` era criado sem driver adapter. O projeto usa SQL Server, então:
+O projeto foi convertido de SQL Server para PostgreSQL para seguir o padrão utilizado com o professor. O Prisma 7 exige um driver adapter, portanto a conexão foi ajustada em `Back-End/src/database/client.ts`:
 
-- `Back-End/src/database/client.ts` agora importa `PrismaMssql` de `@prisma/adapter-mssql`.
-- O adapter recebe a mesma `DATABASE_URL` do `.env`, e é passado ao construtor de `PrismaClient`.
-- A verificação da variável de ambiente continua ocorrendo antes de criar a conexão.
-- As consultas seguem registradas no terminal durante o desenvolvimento.
-- Adicionei `@prisma/adapter-mssql` e removi `@prisma/adapter-pg` e `pg`, que eram dependências para PostgreSQL e não eram utilizadas pelo projeto SQL Server.
+- O arquivo importa `PrismaPg` de `@prisma/adapter-pg` em vez de `PrismaMssql`.
+- O adapter recebe a `DATABASE_URL` definida no `.env` e é passado ao construtor de `PrismaClient`.
+- A validação da variável de ambiente continua ocorrendo antes de criar a conexão.
+- O driver `pg` foi adicionado às dependências do projeto e o adapter de SQL Server foi removido.
+- O schema Prisma passou a usar `provider = "postgresql"`.
+- O `docker-compose.yml` agora define um serviço PostgreSQL na porta `5432`, com banco `chicdog` e healthcheck.
+- A migration antiga, que usava sintaxe do SQL Server, foi arquivada em `prisma/legacy-sqlserver/` e não é executada pelo PostgreSQL.
+- Uma nova migration PostgreSQL foi gerada em `prisma/migrations/20260925202218_init/migration.sql`, usando `SERIAL`, `BOOLEAN`, `TIMESTAMP`, `DECIMAL` e chaves estrangeiras compatíveis com PostgreSQL.
+- `Banco/BD.sql` foi atualizado para refletir o mesmo schema.
 
-### Testes executados
+### Testes e verificações executados
 
-- `tsc --noEmit`: compilação sem erros.
-- `prisma validate`: schema válido.
-- Prisma adapter: conexão de leitura ao banco `ChicDog` funcionou.
-- `prisma migrate status`: confirmou uma migração instalada e schema atualizado.
-- `npm run dev`: migração sem pendências e servidor iniciou na porta 3000.
-- Teste HTTP de integração: 28 verificações passaram, incluindo CRUD de `TipoUsuario` (inclusive exclusão bem-sucedida e bloqueada por FK), CRUD de `Usuario`, validações, senha hash, login, usuário inativo e restrições de chave estrangeira.
-- Limpeza: os registros temporários dos testes foram apagados; a consulta final confirmou zero usuários e tipos de teste.
+- `npx tsc --noEmit`: verificação de tipos concluída sem erros.
+- `npx prisma validate`: schema Prisma válido.
+- `docker compose config`: configuração do Docker Compose validada.
+- `docker compose up -d postgres`: serviço PostgreSQL iniciado.
+- `docker compose ps`: serviço `chicdog_postgres` reportado como `healthy`.
+- `npx prisma migrate dev --name init`: nova migration PostgreSQL gerada.
+- `npx prisma generate`: Prisma Client regenerado para a configuração atual.
+- `npm run dev` ainda não foi executado nesta etapa; o teste HTTP dos endpoints fica para a próxima validação.
 
-O estado de migração foi consultado fora do sandbox. A verificação TLS da ferramenta CLI dentro do sandbox falhava por restrição do ambiente, mas fora dele o comando oficial completou normalmente.
-
-
-### Auditoria de dependências
-
-`npm audit --omit=dev` reportou 4 alertas de severidade alta no grafo de dependências (`deepmerge-ts` e `mysql2`, trazidos por dependências Prisma/configuração). A correção automática sugerida exige `npm audit fix --force` e rebaixaria `prisma` para 6.19.3, incompatível com o adapter SQL Server configurado para Prisma 7. Não apliquei esse downgrade; exige uma migração planejada de versões e nova bateria de testes.
+A auditoria de dependências será revisada novamente depois que a API for executada com o PostgreSQL.
 
 ---
 
@@ -357,3 +357,57 @@ Foram criados dois arquivos para documentar os formatos aceitos pela API:
 - `tipoUsuarioService.ts` recebe os DTOs como tipos de entrada, extrai `nome` e mantém validação em tempo de execução: exige texto não vazio e limita o nome a 50 caracteres, conforme a coluna do banco.
 
 A compilação `tsc --noEmit` passou depois dessa integração.
+
+---
+
+## 15. CRUD de `Produto`
+
+A terceira tabela funcional do projeto é `Produto`. O módulo segue a mesma organização em camadas usada por `TipoUsuario` e `Usuario`.
+
+### Arquivos criados
+
+- `Back-End/src/dto/produto/createProdutoDto.ts`: define `CreateProdutoDto` com `nome`, `preco`, `descricao` e `disponivel` opcional.
+- `Back-End/src/dto/produto/updateProdutoDto.ts`: define `UpdateProdutoDto` com todos os campos opcionais para permitir atualização parcial.
+- `Back-End/src/repositories/produtoRepository.ts`: contém `findAll`, `findById`, `create`, `update` e `remove` usando o Prisma.
+- `Back-End/src/services/produtoService.ts`: contém as validações e regras de negócio do módulo.
+- `Back-End/src/controllers/produtoController.ts`: lê os parâmetros e o corpo JSON, chama o service e trata os status HTTP.
+- `Back-End/src/routes/produtos.ts`: registra as rotas do recurso.
+
+### Validações do service
+
+- `nome`: texto não vazio, com no máximo 80 caracteres, conforme a coluna do banco.
+- `preco`: número finito e maior que zero.
+- `descricao`: texto não vazio, com no máximo 100 caracteres.
+- `disponivel`: boolean opcional no cadastro e boolean quando enviado na atualização.
+- No cadastro, quando `disponivel` não é enviado, o produto assume `true`, conforme o padrão do schema.
+- Na atualização, apenas os campos presentes no corpo são enviados ao repository.
+- Uma atualização sem campos válidos é rejeitada com `AppError` e status `400`.
+- Um produto inexistente é rejeitado com `AppError` e status `404`.
+
+### Rotas de `Produto`
+
+| Método e caminho | Corpo | Ação |
+|---|---|---|
+| `GET /produtos` | — | Lista todos os produtos. |
+| `GET /produtos/:id` | — | Busca um produto pelo ID. |
+| `POST /produtos` | `{"nome":"Cachorro-quente","preco":15.5,"descricao":"Lanche para cachorro"}` | Cria um produto e responde `201`. |
+| `PUT /produtos/:id` | `{"preco":18.9}` | Atualiza os campos enviados. |
+| `DELETE /produtos/:id` | — | Exclui um produto e responde `204`. |
+
+O controller valida o parâmetro `id` antes de chamar o service. Valores que não representam um inteiro positivo são rejeitados com status `400`.
+
+A verificação `npx tsc --noEmit` passou após a criação do módulo.
+
+---
+
+## 16. Estado atual da entrega
+
+A entrega atual possui três módulos de API funcionando:
+
+- `TipoUsuario`;
+- `Usuario`;
+- `Produto`.
+
+O schema também possui as entidades `Pedido`, `Pagamento` e `ItemPedido`, mas elas ainda não possuem controllers, services ou repositories próprios. A conversão do banco para PostgreSQL foi concluída e a migration ativa está em `prisma/migrations/20260925202218_init/migration.sql`.
+
+Ainda falta executar a validação final da API com `npm run dev` e testar os endpoints com o PostgreSQL em execução.
