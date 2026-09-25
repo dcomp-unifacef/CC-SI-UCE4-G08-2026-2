@@ -1,5 +1,5 @@
 ﻿import "dotenv/config";
-import { PrismaMssql } from "@prisma/adapter-mssql";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 const connectionString = process.env.DATABASE_URL;
@@ -7,8 +7,8 @@ if (!connectionString) {
   throw new Error("A variável DATABASE_URL não foi definida no arquivo .env");
 }
 
-// Prisma 7 exige um driver adapter; este projeto usa SQL Server.
-const adapter = new PrismaMssql(connectionString);
+// Prisma 7 exige um driver adapter; este projeto usa PostgreSQL.
+const adapter = new PrismaPg(connectionString);
 
 export const prisma = new PrismaClient({
   adapter,

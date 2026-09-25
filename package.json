@@ -1,89 +1,92 @@
 {
-  
-  "name": "restaurant-automation-system",
-  
-  "version": "1.0.0",
-  
-  "description": "Dedicated repo to implement a system to automate orders of a restaurant",
-  
-  "main": "index.js",
-  
-  "scripts": {
-  
-    
-  "test": "echo \"Error: no test specified\" && exit 1",
-  
-    
-  "dev": "prisma migrate deploy && tsx Back-End/src/app.ts"
-  
-  },
-  
-  "repository": {
-  
-    
-  "type": "git",
-  
-    
-  "url": "git+https://github.com/telinii/Restaurant-Automation-System.git"
-  
-  },
-  
-  "keywords": [],
-  
-  "author": "",
-  
-  "license": "ISC",
-  
-  "bugs": {
-  
-    
-  "url": "https://github.com/telinii/Restaurant-Automation-System/issues"
-  
-  },
-  
-  "homepage": "https://github.com/telinii/Restaurant-Automation-System#readme",
-  
-  "dependencies": {
-  
-    
-  "@prisma/adapter-mssql": "^7.10.0",
-  
-    
-  "@prisma/client": "^7.10.0",
-  
-    
-  "bcryptjs": "^3.0.3",
-  
-    
-  "dotenv": "^18.0.3",
-  
-    
-  "express": "^5.2.1",
-  
-    
-  "jsonwebtoken": "^9.0.3"
-  
-  },
-  
-  "devDependencies": {
-  
-    
-  "@types/express": "^5.0.6",
-  
-    
-  "@types/jsonwebtoken": "^9.0.10",
-  
-    
-  "@types/node": "^22.20.4",
-  
-    
-  "prisma": "^7.10.0",
-  
-    
-  "tsx": "^4.23.13",
-  
-    
-  "typescript": "^5.9.2"
-  
-  }
+  
+ "name": "restaurant-automation-system",
+  
+ "version": "1.0.0",
+  
+ "description": "Dedicated repo to implement a system to automate orders of a restaurant",
+  
+ "main": "index.js",
+  
+ "scripts": {
+  
+   
+ "test": "echo \"Error: no test specified\" && exit 1",
+  
+   
+ "dev": "prisma migrate deploy && tsx Back-End/src/app.ts"
+  
+ },
+  
+ "repository": {
+  
+   
+ "type": "git",
+  
+   
+ "url": "git+https://github.com/telinii/Restaurant-Automation-System.git"
+  
+ },
+  
+ "keywords": [],
+  
+ "author": "",
+  
+ "license": "ISC",
+  
+ "bugs": {
+  
+   
+ "url": "https://github.com/telinii/Restaurant-Automation-System/issues"
+  
+ },
+  
+ "homepage": "https://github.com/telinii/Restaurant-Automation-System#readme",
+  
+ "dependencies": {
+  
+   
+ "@prisma/adapter-pg": "^7.10.0",
+  
+   
+ "@prisma/client": "^7.10.0",
+  
+   
+ "bcryptjs": "^3.0.3",
+  
+   
+ "dotenv": "^18.0.3",
+  
+   
+ "express": "^5.2.1",
+  
+   
+ "jsonwebtoken": "^9.0.3",
+  
+   
+ "pg": "^8.23.0"
+  
+ },
+  
+ "devDependencies": {
+  
+   
+ "@types/express": "^5.0.6",
+  
+   
+ "@types/jsonwebtoken": "^9.0.10",
+  
+   
+ "@types/node": "^22.20.4",
+  
+   
+ "prisma": "^7.10.0",
+  
+   
+ "tsx": "^4.23.13",
+  
+   
+ "typescript": "^5.9.2"
+  
+ }
 }

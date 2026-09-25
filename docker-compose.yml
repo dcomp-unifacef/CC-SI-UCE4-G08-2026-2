@@ -1,31 +1,43 @@
 services:
-  database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql_server
-    platform: linux/amd64
+  postgres:
+    image: postgres:16
+    container_name: chicdog_postgres
     ports:
-      - "1433:1433"
+      - "5432:5432"
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=pass3006!
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prompt_solutions
+      - POSTGRES_DB=chicdog
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chicdog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - chicdog-network
 
-  
   app:
     build: .
     container_name: chicdog_backend
     ports:
-      - "3333:3333" # Porta onde sua API Express vai rodar para o mundo externo
+      - "3333:3333"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     environment:
-      - DATABASE_URL=sqlserver://database:1433;database=ChicDog;user=sa;password=pass3006!;encrypt=true;trustServerCertificate=true;
+      - DATABASE_URL=postgresql://postgres:prompt_solutions@postgres:5432/chicdog
       - PORT=3333
     depends_on:
-      - database
+      postgres:
+        condition: service_healthy
     networks:
       - chicdog-network
 
 networks:
   chicdog-network:
     driver: bridge
+
+volumes:
+  postgres_data:
