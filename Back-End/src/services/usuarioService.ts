@@ -11,19 +11,30 @@ function getObjectData(data: unknown): Record<string, unknown> {
   return data as Record<string, unknown>;
 }
 
-function validateText(value: unknown, field: string, maxLength: number): string {
+function validateText(
+  value: unknown,
+  field: string,
+  maxLength: number,
+): string {
   if (typeof value !== "string" || value.trim().length === 0) {
     throw new AppError(`O campo ${field} é obrigatório.`, 400);
   }
   const normalized = value.trim();
   if (normalized.length > maxLength) {
-    throw new AppError(`O campo ${field} deve ter no máximo ${maxLength} caracteres.`, 400);
+    throw new AppError(
+      `O campo ${field} deve ter no máximo ${maxLength} caracteres.`,
+      400,
+    );
   }
   return normalized;
 }
 
 function validatePassword(value: unknown): string {
-  if (typeof value !== "string" || value.length === 0 || value.trim().length === 0) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    value.trim().length === 0
+  ) {
     throw new AppError("O campo senha é obrigatório.", 400);
   }
   if (value.length > 255) {
@@ -45,7 +56,10 @@ function throwDatabaseError(error: any): never {
     throw new AppError("Este login de usuário já está em uso.", 409);
   }
   if (error?.code === "P2003") {
-    throw new AppError("A relação do usuário com o tipo não pôde ser aplicada.", 400);
+    throw new AppError(
+      "A relação do usuário com o tipo não pôde ser aplicada.",
+      400,
+    );
   }
   throw error;
 }
@@ -73,7 +87,8 @@ async function create(data: unknown) {
   const idTipoUsuario = validateIdTipoUsuario(input.idTipoUsuario);
 
   const usuarioExistente = await repository.findByLogin(loginUsuario);
-  if (usuarioExistente) throw new AppError("Este login de usuário já está em uso.", 409);
+  if (usuarioExistente)
+    throw new AppError("Este login de usuário já está em uso.", 409);
   await ensureTipoUsuarioExists(idTipoUsuario);
 
   const dadosUsuario: CreateUsuarioDto & { statusUsuario: boolean } = {

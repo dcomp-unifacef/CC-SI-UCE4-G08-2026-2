@@ -42,7 +42,10 @@ async function remove(id: number) {
   } catch (error: any) {
     // Um tipo associado a usuários não pode ser apagado por causa da FK.
     if (error?.code === "P2003") {
-      throw new AppError("Não é possível excluir um tipo associado a usuários.", 409);
+      throw new AppError(
+        "Não é possível excluir um tipo associado a usuários.",
+        409,
+      );
     }
     throw error;
   }
