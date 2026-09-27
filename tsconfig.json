@@ -1,0 +1,18 @@
+﻿{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./Back-End",
+    "types": ["node"],
+    "moduleDetection": "force"
+  },
+  "include": ["Back-End/**/*"]
+}
+
+

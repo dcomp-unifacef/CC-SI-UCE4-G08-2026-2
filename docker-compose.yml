@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: chicdog_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prompt_solutions
+      - POSTGRES_DB=chicdog
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chicdog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - chicdog-network
+
+  app:
+    build: .
+    container_name: chicdog_backend
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://postgres:prompt_solutions@postgres:5432/chicdog
+      - PORT=3333
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chicdog-network
+
+networks:
+  chicdog-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
