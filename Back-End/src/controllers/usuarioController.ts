@@ -13,7 +13,11 @@ function parseId(raw: unknown): number {
   return id;
 }
 
-export async function retrieveAll(_req: Request, res: Response, next: NextFunction) {
+export async function retrieveAll(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     return res.json(await service.findAll());
   } catch (error) {
@@ -21,7 +25,11 @@ export async function retrieveAll(_req: Request, res: Response, next: NextFuncti
   }
 }
 
-export async function retrieveOne(req: Request, res: Response, next: NextFunction) {
+export async function retrieveOne(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     return res.json(await service.findById(parseId(req.params.id)));
   } catch (error) {

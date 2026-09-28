@@ -44,11 +44,7 @@ export async function retrieveOne(
   }
 }
 
-export async function create(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const data = req.body as CreateProdutoDto;
 
@@ -58,11 +54,7 @@ export async function create(
   }
 }
 
-export async function update(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = parseId(req.params.id);
     const data = req.body as UpdateProdutoDto;
@@ -73,11 +65,7 @@ export async function update(
   }
 }
 
-export async function remove(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const id = parseId(req.params.id);
 
