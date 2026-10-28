@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: chicdog_postgres
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=prompt_solutions
@@ -29,6 +29,16 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:prompt_solutions@postgres:5432/chicdog
       - PORT=3333
+      - JWT_SECRET=${JWT_SECRET:-troque-este-segredo-em-producao}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1d}
+      - ADMIN_ROLE=${ADMIN_ROLE:-Administrador}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - SEED_ADMIN_LOGIN=${SEED_ADMIN_LOGIN:-admin}
+      - SEED_ADMIN_SENHA=${SEED_ADMIN_SENHA:-admin123}
+      - SEED_CLIENTE_LOGIN=${SEED_CLIENTE_LOGIN:-cliente}
+      - SEED_CLIENTE_SENHA=${SEED_CLIENTE_SENHA:-cliente123}
+      - SEED_GARCOM_LOGIN=${SEED_GARCOM_LOGIN:-garcom}
+      - SEED_GARCOM_SENHA=${SEED_GARCOM_SENHA:-garcom123}
     depends_on:
       postgres:
         condition: service_healthy

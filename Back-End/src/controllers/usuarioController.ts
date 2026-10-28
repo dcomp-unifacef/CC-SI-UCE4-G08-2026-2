@@ -1,17 +1,8 @@
 ﻿import { Request, Response, NextFunction } from "express";
 import service from "../services/usuarioService";
-import { AppError } from "../errors/AppError";
-
-function parseId(raw: unknown): number {
-  if (typeof raw !== "string") {
-    throw new AppError("O id deve ser um inteiro positivo.", 400);
-  }
-  const id = Number(raw);
-  if (!Number.isInteger(id) || id <= 0) {
-    throw new AppError("O id deve ser um inteiro positivo.", 400);
-  }
-  return id;
-}
+import type { AuthenticatedRequest } from "../middlewares/authMiddleware";
+import { isAdminRole } from "../utils/roles";
+import { parseId } from "../utils/validation";
 
 export async function retrieveAll(
   _req: Request,
@@ -39,7 +30,10 @@ export async function retrieveOne(
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    return res.status(201).json(await service.create(req.body));
+    const usuario = (req as AuthenticatedRequest).usuarioAutenticado;
+    const isAdmin = usuario ? isAdminRole(usuario.tipo) : false;
+
+    return res.status(201).json(await service.create(req.body, { isAdmin }));
   } catch (error) {
     return next(error);
   }

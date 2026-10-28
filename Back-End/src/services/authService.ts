@@ -1,7 +1,7 @@
 import { prisma } from "../database/client";
 import { compare } from "bcryptjs";
-import { sign } from "jsonwebtoken";
 import { AppError } from "../errors/AppError";
+import { signToken } from "../utils/jwt";
 
 interface IAuthInput {
   loginUsuario: string;
@@ -28,18 +28,10 @@ export async function executeLogin({ loginUsuario, senha }: IAuthInput) {
     throw new AppError("Login ou senha incorretos.", 401);
   }
 
-  const tokenSecreta = "chave_secreta_super_segura_do_chicdog"; 
-
-  const token = sign(
-    { 
-      tipo: usuario.tipoUsuario.nome 
-    }, 
-    tokenSecreta, 
-    {
-      subject: String(usuario.idUsuario),
-      expiresIn: "1d"
-    }
-  );
+  const token = signToken({
+    idUsuario: usuario.idUsuario,
+    tipo: usuario.tipoUsuario.nome,
+  });
 
   return {
     usuario: {

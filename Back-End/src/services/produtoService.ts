@@ -2,27 +2,7 @@ import repository from "../repositories/produtoRepository";
 import { AppError } from "../errors/AppError";
 import { CreateProdutoDto } from "../dto/produto/createProdutoDto";
 import { UpdateProdutoDto } from "../dto/produto/updateProdutoDto";
-
-function validarTexto(
-  valor: unknown,
-  campo: string,
-  tamanhoMaximo: number,
-): string {
-  if (typeof valor !== "string" || valor.trim().length === 0) {
-    throw new AppError(`O campo ${campo} é obrigatório.`, 400);
-  }
-
-  const texto = valor.trim();
-
-  if (texto.length > tamanhoMaximo) {
-    throw new AppError(
-      `O campo ${campo} deve ter no máximo ${tamanhoMaximo} caracteres.`,
-      400,
-    );
-  }
-
-  return texto;
-}
+import { validateText } from "../utils/validation";
 
 function validarPreco(valor: unknown): number {
   if (typeof valor !== "number" || !Number.isFinite(valor) || valor <= 0) {
@@ -55,9 +35,9 @@ async function findById(id: number) {
 }
 
 async function create(data: CreateProdutoDto) {
-  const nome = validarTexto(data.nome, "nome", 80);
+  const nome = validateText(data.nome, "nome", 80);
   const preco = validarPreco(data.preco);
-  const descricao = validarTexto(data.descricao, "descricao", 100);
+  const descricao = validateText(data.descricao, "descricao", 100);
   const disponivel =
     data.disponivel === undefined ? true : validarDisponivel(data.disponivel);
 
@@ -75,7 +55,7 @@ async function update(id: number, data: UpdateProdutoDto) {
   const dadosAtualizados: UpdateProdutoDto = {};
 
   if (Object.prototype.hasOwnProperty.call(data, "nome")) {
-    dadosAtualizados.nome = validarTexto(data.nome, "nome", 80);
+    dadosAtualizados.nome = validateText(data.nome, "nome", 80);
   }
 
   if (Object.prototype.hasOwnProperty.call(data, "preco")) {
@@ -83,7 +63,7 @@ async function update(id: number, data: UpdateProdutoDto) {
   }
 
   if (Object.prototype.hasOwnProperty.call(data, "descricao")) {
-    dadosAtualizados.descricao = validarTexto(data.descricao, "descricao", 100);
+    dadosAtualizados.descricao = validateText(data.descricao, "descricao", 100);
   }
 
   if (Object.prototype.hasOwnProperty.call(data, "disponivel")) {
@@ -102,7 +82,19 @@ async function update(id: number, data: UpdateProdutoDto) {
 
 async function remove(id: number) {
   await findById(id);
-  return repository.remove(id);
+
+  try {
+    return await repository.remove(id);
+  } catch (error: any) {
+    if (error?.code === "P2003") {
+      throw new AppError(
+        "Não é possível excluir um produto associado a itens de pedido.",
+        409,
+      );
+    }
+
+    throw error;
+  }
 }
 
 export default {

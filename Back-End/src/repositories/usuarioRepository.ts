@@ -40,6 +40,13 @@ function findTipoUsuarioById(idTipoUsuario: number) {
   });
 }
 
+function findTipoUsuarioByNome(nome: string) {
+  return prisma.tipoUsuario.findFirst({
+    where: { nome },
+    select: { idTipoUsuario: true },
+  });
+}
+
 function create(data: CreateUsuarioDto & { senha: string; statusUsuario: boolean }) {
   return prisma.usuario.create({
     data,
@@ -69,6 +76,7 @@ export default {
   findById,
   findByLogin,
   findTipoUsuarioById,
+  findTipoUsuarioByNome,
   create,
   update,
   deactivate,

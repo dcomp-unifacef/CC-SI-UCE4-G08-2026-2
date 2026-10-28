@@ -1,22 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import service from "../services/produtoService";
-import { AppError } from "../errors/AppError";
 import { CreateProdutoDto } from "../dto/produto/createProdutoDto";
 import { UpdateProdutoDto } from "../dto/produto/updateProdutoDto";
-
-function parseId(raw: unknown): number {
-  if (typeof raw !== "string") {
-    throw new AppError("O id deve ser um inteiro positivo.", 400);
-  }
-
-  const id = Number(raw);
-
-  if (!Number.isInteger(id) || id <= 0) {
-    throw new AppError("O id deve ser um inteiro positivo.", 400);
-  }
-
-  return id;
-}
+import { parseId } from "../utils/validation";
 
 export async function retrieveAll(
   _req: Request,

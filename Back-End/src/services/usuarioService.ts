@@ -3,31 +3,12 @@ import { hash } from "bcryptjs";
 import { AppError } from "../errors/AppError";
 import { CreateUsuarioDto } from "../dto/usuario/createUsuarioDto";
 import { UpdateUsuarioDto } from "../dto/usuario/updateUsuarioDto";
-
-function getObjectData(data: unknown): Record<string, unknown> {
-  if (data === null || typeof data !== "object" || Array.isArray(data)) {
-    throw new AppError("O corpo da requisição deve ser um objeto JSON.", 400);
-  }
-  return data as Record<string, unknown>;
-}
-
-function validateText(
-  value: unknown,
-  field: string,
-  maxLength: number,
-): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
-    throw new AppError(`O campo ${field} é obrigatório.`, 400);
-  }
-  const normalized = value.trim();
-  if (normalized.length > maxLength) {
-    throw new AppError(
-      `O campo ${field} deve ter no máximo ${maxLength} caracteres.`,
-      400,
-    );
-  }
-  return normalized;
-}
+import { ROLE_CLIENTE } from "../utils/roles";
+import {
+  getObjectData,
+  validatePositiveInt,
+  validateText,
+} from "../utils/validation";
 
 function validatePassword(value: unknown): string {
   if (
@@ -45,10 +26,7 @@ function validatePassword(value: unknown): string {
 }
 
 function validateIdTipoUsuario(value: unknown): number {
-  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
-    throw new AppError("idTipoUsuario deve ser um inteiro positivo.", 400);
-  }
-  return value;
+  return validatePositiveInt(value, "idTipoUsuario");
 }
 
 function throwDatabaseError(error: any): never {
@@ -79,12 +57,32 @@ async function findById(id: number) {
   return usuario;
 }
 
-async function create(data: unknown) {
+async function resolverTipoUsuario(
+  input: Record<string, unknown>,
+  isAdmin: boolean,
+) {
+  if (isAdmin && input.idTipoUsuario !== undefined) {
+    return validateIdTipoUsuario(input.idTipoUsuario);
+  }
+
+  const tipoCliente = await repository.findTipoUsuarioByNome(ROLE_CLIENTE);
+
+  if (!tipoCliente) {
+    throw new AppError("Tipo de usuário Cliente não configurado.", 500);
+  }
+
+  return tipoCliente.idTipoUsuario;
+}
+
+async function create(
+  data: unknown,
+  options: { isAdmin?: boolean } = {},
+) {
   const input = getObjectData(data);
   const nome = validateText(input.nome, "nome", 80);
   const loginUsuario = validateText(input.loginUsuario, "loginUsuario", 80);
   const senha = validatePassword(input.senha);
-  const idTipoUsuario = validateIdTipoUsuario(input.idTipoUsuario);
+  const idTipoUsuario = await resolverTipoUsuario(input, options.isAdmin === true);
 
   const usuarioExistente = await repository.findByLogin(loginUsuario);
   if (usuarioExistente)
