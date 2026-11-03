@@ -1,12 +1,16 @@
 ﻿import { Router } from "express";
 import * as controller from "../controllers/tipoUsuarioController";
+import { autenticar, autorizar } from "../middlewares/auth";
+import { PERFIS } from "../domain/perfis";
 
 const router = Router();
+
+router.use(autenticar);
+
 router.get("/", controller.retrieveAll);
 router.get("/:id", controller.retrieveOne);
-router.post("/", controller.create);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.post("/", autorizar(PERFIS.GERENTE), controller.create);
+router.put("/:id", autorizar(PERFIS.GERENTE), controller.update);
+router.delete("/:id", autorizar(PERFIS.GERENTE), controller.remove);
 
-// O app.ts atual carrega as rotas com require().
-module.exports = router;
+export default router;

@@ -1,23 +1,45 @@
-FROM node:20-alpine
+FROM node:20-alpine AS base
 
-# Cria o diretório de trabalho dentro do contêiner
 WORKDIR /usr/src/app
 
-# Copia os arquivos de dependências
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY prisma.config.ts ./
 
-# Instala as dependências de desenvolvimento e produção
 RUN npm install
 
-# Copia o restante do código do projeto
 COPY . .
 
-# Gera o Prisma Client com as tipagens corretas
 RUN npx prisma generate
 
-# Expõe a porta que a aplicação escuta
+FROM base AS dev
+
+ENV NODE_ENV=development
+
 EXPOSE 3333
 
-# Comando para rodar a aplicação em modo de desenvolvimento
 CMD ["npm", "run", "dev"]
+
+FROM base AS build
+
+RUN npm run build
+
+FROM node:20-alpine AS production
+
+WORKDIR /usr/src/app
+
+ENV NODE_ENV=production
+
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY prisma.config.ts tsconfig.json ./
+
+RUN npm install
+
+COPY --from=build /usr/src/app/dist ./dist
+
+RUN npx prisma generate
+
+EXPOSE 3333
+
+CMD ["npm", "start"]

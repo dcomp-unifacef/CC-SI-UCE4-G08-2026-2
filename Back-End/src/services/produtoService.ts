@@ -2,6 +2,7 @@ import repository from "../repositories/produtoRepository";
 import { AppError } from "../errors/AppError";
 import { CreateProdutoDto } from "../dto/produto/createProdutoDto";
 import { UpdateProdutoDto } from "../dto/produto/updateProdutoDto";
+import { serializeProduto } from "../utils/serializers";
 
 function validarTexto(
   valor: unknown,
@@ -41,7 +42,8 @@ function validarDisponivel(valor: unknown): boolean {
 }
 
 async function findAll() {
-  return repository.findAll();
+  const produtos = await repository.findAll();
+  return produtos.map(serializeProduto);
 }
 
 async function findById(id: number) {
@@ -51,7 +53,7 @@ async function findById(id: number) {
     throw new AppError("Produto não encontrado.", 404);
   }
 
-  return produto;
+  return serializeProduto(produto);
 }
 
 async function create(data: CreateProdutoDto) {
@@ -61,12 +63,14 @@ async function create(data: CreateProdutoDto) {
   const disponivel =
     data.disponivel === undefined ? true : validarDisponivel(data.disponivel);
 
-  return repository.create({
+  const produto = await repository.create({
     nome,
     preco,
     descricao,
     disponivel,
   });
+
+  return serializeProduto(produto);
 }
 
 async function update(id: number, data: UpdateProdutoDto) {
@@ -97,12 +101,12 @@ async function update(id: number, data: UpdateProdutoDto) {
     );
   }
 
-  return repository.update(id, dadosAtualizados);
+  return serializeProduto(await repository.update(id, dadosAtualizados));
 }
 
 async function remove(id: number) {
   await findById(id);
-  return repository.remove(id);
+  return serializeProduto(await repository.remove(id));
 }
 
 export default {

@@ -3,15 +3,15 @@ services:
     image: postgres:16
     container_name: chicdog_postgres
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=prompt_solutions
-      - POSTGRES_DB=chicdog
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-prompt_solutions}
+      - POSTGRES_DB=${POSTGRES_DB:-chicdog}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d chicdog"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-chicdog}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -19,7 +19,9 @@ services:
       - chicdog-network
 
   app:
-    build: .
+    build:
+      context: .
+      target: dev
     container_name: chicdog_backend
     ports:
       - "3333:3333"
@@ -27,8 +29,14 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     environment:
-      - DATABASE_URL=postgresql://postgres:prompt_solutions@postgres:5432/chicdog
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-prompt_solutions}@postgres:5432/${POSTGRES_DB:-chicdog}
       - PORT=3333
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1d}
+      - SEED_ADMIN_NOME=${SEED_ADMIN_NOME:-Administrador}
+      - SEED_ADMIN_LOGIN=${SEED_ADMIN_LOGIN:-admin}
+      - SEED_ADMIN_SENHA=${SEED_ADMIN_SENHA:-admin123}
+    command: sh -c "npx prisma migrate deploy && npm run seed && npm run dev"
     depends_on:
       postgres:
         condition: service_healthy

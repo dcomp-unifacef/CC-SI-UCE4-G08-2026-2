@@ -2,6 +2,7 @@ import { prisma } from "../database/client";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { AppError } from "../errors/AppError";
+import { getJwtExpiresIn, getJwtSecret } from "../config/auth";
 
 interface IAuthInput {
   loginUsuario: string;
@@ -11,7 +12,7 @@ interface IAuthInput {
 export async function executeLogin({ loginUsuario, senha }: IAuthInput) {
   const usuario = await prisma.usuario.findUnique({
     where: { loginUsuario },
-    include: { tipoUsuario: true }
+    include: { tipoUsuario: true },
   });
 
   if (!usuario) {
@@ -19,7 +20,10 @@ export async function executeLogin({ loginUsuario, senha }: IAuthInput) {
   }
 
   if (!usuario.statusUsuario) {
-    throw new AppError("Usuário inativo. Entre em contato com o administrador.", 403);
+    throw new AppError(
+      "Usuário inativo. Entre em contato com o administrador.",
+      403,
+    );
   }
 
   const senhaBate = await compare(senha, usuario.senha);
@@ -28,17 +32,16 @@ export async function executeLogin({ loginUsuario, senha }: IAuthInput) {
     throw new AppError("Login ou senha incorretos.", 401);
   }
 
-  const tokenSecreta = "chave_secreta_super_segura_do_chicdog"; 
-
   const token = sign(
-    { 
-      tipo: usuario.tipoUsuario.nome 
-    }, 
-    tokenSecreta, 
+    {
+      tipo: usuario.tipoUsuario.nome,
+      nome: usuario.nome,
+    },
+    getJwtSecret(),
     {
       subject: String(usuario.idUsuario),
-      expiresIn: "1d"
-    }
+      expiresIn: getJwtExpiresIn(),
+    },
   );
 
   return {
@@ -46,9 +49,8 @@ export async function executeLogin({ loginUsuario, senha }: IAuthInput) {
       id: usuario.idUsuario,
       nome: usuario.nome,
       login: usuario.loginUsuario,
-      tipo: usuario.tipoUsuario.nome
+      tipo: usuario.tipoUsuario.nome,
     },
-    token
+    token,
   };
-  
 }

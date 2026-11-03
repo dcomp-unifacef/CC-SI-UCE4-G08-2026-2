@@ -404,7 +404,47 @@ A verificação `npx tsc --noEmit` passou após a criação do módulo.
 
 ---
 
-## 16. Estado atual da entrega
+## 16. Atualização: autenticação, pedidos e pagamentos
+
+Esta seção registra a evolução do backend após a entrega inicial de `TipoUsuario`, `Usuario` e `Produto`.
+
+### Autenticação e autorização
+
+- `authService.ts` passou a ler `JWT_SECRET` e `JWT_EXPIRES_IN` das variáveis de ambiente; o segredo não fica mais fixo no código.
+- `middlewares/auth.ts` contém `autenticar` (valida o token Bearer) e `autorizar` (restringe por perfil).
+- O administrador tem acesso total. Gerente administra cadastros, pedidos e pagamentos; garçom opera pedidos e pagamentos; cozinheiro atualiza a preparação; cliente apenas consulta dados autenticado.
+- Todas as rotas, exceto `POST /usuarios/login`, exigem `Authorization: Bearer <token>`.
+
+### Pedidos e itens
+
+- Novos arquivos: `pedidoRepository.ts`, `pedidoService.ts`, `pedidoController.ts`, `routes/pedidos.ts` e DTOs em `dto/pedido/`.
+- O pedido é criado com itens, captura o preço do produto no momento da venda e calcula `valorTotal` pela soma dos subtotais.
+- Rotas de itens: adicionar, alterar quantidade e remover. Itens repetidos são agrupados.
+- Regras de status em `domain/pedidoRules.ts`: `Pendente`, `Em preparo`, `Pronto`, `Entregue`, `Cancelado`.
+- Alterações de itens e do pedido só são permitidas enquanto o status é `Pendente`.
+- `GET /pedidos/fila` devolve pedidos `Pendente` e `Em preparo` e é restrito à equipe (garçom, cozinheiro e gerente).
+- Usuários com perfil `Cliente` só conseguem listar e consultar os próprios pedidos.
+- `DELETE /pedidos/:id` faz cancelamento lógico, preservando o histórico.
+- Quando o cozinheiro inicia ou conclui a preparação, ele é registrado em `idCozinheiro`.
+
+### Pagamentos
+
+- Novos arquivos: `pagamentoRepository.ts`, `pagamentoService.ts`, `pagamentoController.ts`, `routes/pagamentos.ts` e DTOs em `dto/pagamento/`.
+- Um pedido aceita apenas um pagamento (restrição única no banco).
+- O valor é definido pelo total do pedido; se o cliente enviar `valor`, ele precisa coincidir.
+- Pedidos cancelados não podem ser pagos.
+- O status do pagamento aceita `Pendente`, `Pago` e `Cancelado`.
+
+### Banco e scripts
+
+- A migration `20261102120000_pedidos_pagamentos` adiciona `tempoEstimado`, `idCozinheiro`, status do pagamento, índices e as chaves estrangeiras ajustadas.
+- `prisma/seed.ts` cria os perfis, usuários de teste e produtos iniciais.
+- Scripts `build`, `start`, `typecheck`, `test` e `seed` foram adicionados ao `package.json`.
+- `docker-compose.yml` aplica migrations e executa o seed antes de iniciar a API; o `Dockerfile` tem estágios `dev` e `production`.
+- Testes automatizados cobrem as regras de status, permissões, transições e cálculo de valores (`npm test`).
+- A API foi validada de ponta a ponta com o Docker em execução, incluindo autenticação, CRUD de pedidos/itens e registro de pagamento.
+
+## 17. Estado atual da entrega
 
 A entrega atual possui três módulos de API funcionando:
 

@@ -1,10 +1,11 @@
-﻿const express = require("express");
-
-const tipoUsuariosRouter = require("./routes/tipoUsuarios");
-const usuariosRouter = require("./routes/usuarios").default;
-const produtosRouter = require("./routes/produtos").default;
-
-const { AppError } = require("./errors/AppError");
+﻿import "dotenv/config";
+import express, { NextFunction, Request, Response } from "express";
+import tipoUsuariosRouter from "./routes/tipoUsuarios";
+import usuariosRouter from "./routes/usuarios";
+import produtosRouter from "./routes/produtos";
+import pedidosRouter from "./routes/pedidos";
+import pagamentosRouter from "./routes/pagamentos";
+import { AppError } from "./errors/AppError";
 
 const app = express();
 
@@ -13,8 +14,14 @@ app.use(express.json());
 app.use("/tipo-usuarios", tipoUsuariosRouter);
 app.use("/usuarios", usuariosRouter);
 app.use("/produtos", produtosRouter);
+app.use("/pedidos", pedidosRouter);
+app.use("/pagamentos", pagamentosRouter);
 
-app.use((error: any, _req: any, res: any, _next: any) => {
+app.use((_req: Request, res: Response) => {
+  return res.status(404).json({ erro: "Rota não encontrada." });
+});
+
+app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({ erro: error.message });
   }
@@ -26,8 +33,4 @@ app.use((error: any, _req: any, res: any, _next: any) => {
   });
 });
 
-const PORT = Number(process.env.PORT) || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando com sucesso na porta ${PORT}`);
-});
+export default app;
