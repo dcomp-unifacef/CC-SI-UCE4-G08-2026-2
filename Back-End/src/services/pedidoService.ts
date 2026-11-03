@@ -9,6 +9,7 @@ import {
   ROLE_CLIENTE,
   ROLE_GARCOM,
   isClienteRole,
+  isCozinheiroRole,
   normalizeRole,
 } from "../utils/roles";
 import {
@@ -38,6 +39,9 @@ const TRANSICOES_STATUS: Record<string, readonly string[]> = {
 };
 
 const STATUS_EDICAO_ITENS = ["Aberto", "Em preparo"];
+
+// O painel da cozinha só avança o preparo; pagamento e entrega são de outros perfis.
+const STATUS_PERMITIDOS_COZINHA = ["Em preparo", "Pronto"];
 
 interface ItemSolicitado {
   idProduto: number;
@@ -120,6 +124,16 @@ function ensureItensEditaveis(pedido: { statusPedido: string }) {
   }
 }
 
+// O perfil Cozinheiro opera apenas o preparo: não cria pedidos nem mexe em itens.
+function ensureNaoCozinheiro(
+  usuario: UsuarioAutenticado | undefined,
+  acao: string,
+) {
+  if (usuario && isCozinheiroRole(usuario.tipo)) {
+    throw new AppError(`O cozinheiro não pode ${acao}.`, 403);
+  }
+}
+
 function validarItens(value: unknown): ItemSolicitado[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw new AppError("Informe ao menos um item no pedido.", 400);
@@ -184,6 +198,8 @@ async function findById(id: number, usuario?: UsuarioAutenticado) {
 }
 
 async function create(data: unknown, usuario?: UsuarioAutenticado) {
+  ensureNaoCozinheiro(usuario, "criar pedidos");
+
   const input = getObjectData(data);
 
   const idCliente =
@@ -253,6 +269,29 @@ async function update(
   }
 
   const input = getObjectData(data);
+
+  if (usuario && isCozinheiroRole(usuario.tipo)) {
+    const campos = Object.keys(input);
+
+    if (campos.length !== 1 || campos[0] !== "statusPedido") {
+      throw new AppError(
+        "O cozinheiro só pode alterar o status do pedido.",
+        403,
+      );
+    }
+
+    const novoStatus = validarStatus(input.statusPedido, pedido.statusPedido);
+
+    if (!STATUS_PERMITIDOS_COZINHA.includes(novoStatus)) {
+      throw new AppError(
+        'O cozinheiro só pode definir o status como "Em preparo" ou "Pronto".',
+        403,
+      );
+    }
+
+    return pedidoRepository.update(id, { statusPedido: novoStatus });
+  }
+
   const dadosAtualizados: UpdatePedidoDto = {};
 
   if (Object.prototype.hasOwnProperty.call(input, "statusPedido")) {
@@ -286,6 +325,8 @@ async function addItem(
   data: unknown,
   usuario?: UsuarioAutenticado,
 ) {
+  ensureNaoCozinheiro(usuario, "alterar itens do pedido");
+
   const pedido = await findById(idPedido, usuario);
   ensureItensEditaveis(pedido);
 
@@ -311,6 +352,8 @@ async function updateItem(
   data: unknown,
   usuario?: UsuarioAutenticado,
 ) {
+  ensureNaoCozinheiro(usuario, "alterar itens do pedido");
+
   const pedido = await findById(idPedido, usuario);
   ensureItensEditaveis(pedido);
 
@@ -370,6 +413,8 @@ async function removeItem(
   idItemPedido: number,
   usuario?: UsuarioAutenticado,
 ) {
+  ensureNaoCozinheiro(usuario, "alterar itens do pedido");
+
   const pedido = await findById(idPedido, usuario);
   ensureItensEditaveis(pedido);
 

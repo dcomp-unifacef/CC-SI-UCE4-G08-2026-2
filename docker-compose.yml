@@ -39,6 +39,8 @@ services:
       - SEED_CLIENTE_SENHA=${SEED_CLIENTE_SENHA:-cliente123}
       - SEED_GARCOM_LOGIN=${SEED_GARCOM_LOGIN:-garcom}
       - SEED_GARCOM_SENHA=${SEED_GARCOM_SENHA:-garcom123}
+      - SEED_COZINHEIRO_LOGIN=${SEED_COZINHEIRO_LOGIN:-cozinheiro}
+      - SEED_COZINHEIRO_SENHA=${SEED_COZINHEIRO_SENHA:-cozinheiro123}
     depends_on:
       postgres:
         condition: service_healthy

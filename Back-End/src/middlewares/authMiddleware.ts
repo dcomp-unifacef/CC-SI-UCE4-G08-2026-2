@@ -3,6 +3,7 @@ import { env } from "../config/env";
 import { AppError } from "../errors/AppError";
 import { verifyToken, type UsuarioAutenticado } from "../utils/jwt";
 import {
+  ROLE_COZINHEIRO,
   ROLE_GARCOM,
   isAdminRole,
   normalizeRole,
@@ -71,7 +72,12 @@ export function authorize(...tiposPermitidos: string[]) {
 }
 
 export const authorizeAdmin = authorize(env.adminRole);
-export const authorizeStaff = authorize(env.adminRole, ROLE_GARCOM);
+export const authorizeStaff = authorize(
+  env.adminRole,
+  ROLE_GARCOM,
+  ROLE_COZINHEIRO,
+);
+export const authorizeCozinha = authorize(env.adminRole, ROLE_COZINHEIRO);
 
 export function authorizeSelfOrAdmin(
   req: Request,

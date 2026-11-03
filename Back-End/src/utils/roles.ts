@@ -2,6 +2,7 @@ import { env } from "../config/env";
 
 export const ROLE_ADMIN = env.adminRole;
 export const ROLE_GARCOM = "Garçom";
+export const ROLE_COZINHEIRO = "Cozinheiro";
 export const ROLE_CLIENTE = "Cliente";
 
 export function normalizeRole(value: string): string {
@@ -20,6 +21,14 @@ export function isClienteRole(value: string): boolean {
   return isRole(value, ROLE_CLIENTE);
 }
 
+export function isCozinheiroRole(value: string): boolean {
+  return isRole(value, ROLE_COZINHEIRO);
+}
+
 export function isStaffRole(value: string): boolean {
-  return isAdminRole(value) || isRole(value, ROLE_GARCOM);
+  return (
+    isAdminRole(value) ||
+    isRole(value, ROLE_GARCOM) ||
+    isRole(value, ROLE_COZINHEIRO)
+  );
 }

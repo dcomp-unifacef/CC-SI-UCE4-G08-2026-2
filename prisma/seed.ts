@@ -66,6 +66,7 @@ async function garantirProduto(
 async function main() {
   const tipoAdministrador = await garantirTipoUsuario("Administrador");
   const tipoGarcom = await garantirTipoUsuario("Garçom");
+  const tipoCozinheiro = await garantirTipoUsuario("Cozinheiro");
   const tipoCliente = await garantirTipoUsuario("Cliente");
 
   const admin = await garantirUsuario(
@@ -87,6 +88,13 @@ async function main() {
     process.env.SEED_GARCOM_NOME ?? "Garçom Exemplo",
     process.env.SEED_GARCOM_SENHA ?? "garcom123",
     tipoGarcom.idTipoUsuario,
+  );
+
+  const cozinheiro = await garantirUsuario(
+    process.env.SEED_COZINHEIRO_LOGIN ?? "cozinheiro",
+    process.env.SEED_COZINHEIRO_NOME ?? "Cozinheiro Exemplo",
+    process.env.SEED_COZINHEIRO_SENHA ?? "cozinheiro123",
+    tipoCozinheiro.idTipoUsuario,
   );
 
   const produtos = [
@@ -121,7 +129,7 @@ async function main() {
   }
 
   console.log(
-    `Seed concluído. Admin: ${admin.loginUsuario}, cliente: ${cliente.loginUsuario}, garçom: ${garcom.loginUsuario}.`,
+    `Seed concluído. Admin: ${admin.loginUsuario}, cliente: ${cliente.loginUsuario}, garçom: ${garcom.loginUsuario}, cozinheiro: ${cozinheiro.loginUsuario}.`,
   );
 }
 
