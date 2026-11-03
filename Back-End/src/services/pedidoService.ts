@@ -119,7 +119,7 @@ function ensureAcessoAoPedido(
 function ensureItensEditaveis(pedido: { statusPedido: string }) {
   if (!podeEditarItens(pedido.statusPedido)) {
     throw new AppError(
-      "Os itens só podem ser alterados enquanto o pedido está em Aberto.",
+      "Os itens só podem ser alterados enquanto o pedido está em Aberto. Se o pedido já foi para a cozinha, não é mais possível alterar os itens.",
       409,
     );
   }
@@ -275,9 +275,11 @@ async function create(data: unknown, usuario?: UsuarioAutenticado) {
   const decisao = decidirCriacao(ativo, { ehCliente });
 
   if (decisao.tipo === "conflito") {
-    throw new AppError("Esta mesa já possui um pedido em andamento.", 409, {
-      idPedido: decisao.idPedido,
-    });
+    throw new AppError(
+      `Esta mesa já possui um pedido em andamento (nº ${decisao.idPedido}). Use o pedido existente para acrescentar itens.`,
+      409,
+      { idPedido: decisao.idPedido },
+    );
   }
 
   if (decisao.tipo === "entrar") {
@@ -306,7 +308,7 @@ async function create(data: unknown, usuario?: UsuarioAutenticado) {
       const existente = await pedidoRepository.findAtivoPorMesa(numeroMesa);
 
       throw new AppError(
-        "Esta mesa já possui um pedido em andamento.",
+        `Esta mesa já possui um pedido em andamento${existente ? ` (nº ${existente.idPedido})` : ""}. Use o pedido existente para acrescentar itens.`,
         409,
         existente ? { idPedido: existente.idPedido } : {},
       );

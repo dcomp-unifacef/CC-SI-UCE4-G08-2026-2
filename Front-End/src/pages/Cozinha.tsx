@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { listarPedidos, atualizarPedido } from "../api/pedidos";
 import { ApiError } from "../api/client";
 import { Layout } from "../components/Layout";
+import { useToast } from "../components/Toast";
 import { StatusBadge } from "../components/StatusBadge";
 import { usePolling } from "../hooks/usePolling";
 import type { Pedido } from "../types/api";
 
 export default function Cozinha() {
+  const toast = useToast();
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [atualizadoEm, setAtualizadoEm] = useState<Date>(new Date());
   const [ocupado, setOcupado] = useState<number | null>(null);
@@ -32,7 +34,7 @@ export default function Cozinha() {
       await atualizarPedido(pedido.idPedido, { statusPedido: novoStatus });
       await carregar();
     } catch (e) {
-      alert(e instanceof ApiError ? e.message : "Falha ao atualizar.");
+      toast.mostrar(e instanceof ApiError ? e.message : "Falha ao atualizar.", "error");
       await carregar();
     } finally {
       setOcupado(null);

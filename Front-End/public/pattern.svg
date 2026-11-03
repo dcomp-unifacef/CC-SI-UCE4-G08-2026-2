@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <pattern id="p" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <rect width="200" height="200" fill="#fff8e1"/>
+      <circle cx="30" cy="40" r="6" fill="#c62828" opacity="0.08"/>
+      <circle cx="150" cy="80" r="4" fill="#ffc107" opacity="0.12"/>
+      <circle cx="90" cy="160" r="8" fill="#c62828" opacity="0.06"/>
+      <circle cx="180" cy="170" r="5" fill="#ffc107" opacity="0.10"/>
+      <g transform="translate(60,90) rotate(-20)" opacity="0.07">
+        <ellipse cx="0" cy="0" rx="22" ry="9" fill="#c62828"/>
+        <rect x="-18" y="-3" width="36" height="6" rx="3" fill="#ffc107"/>
+      </g>
+      <g transform="translate(170,30) rotate(15)" opacity="0.06">
+        <ellipse cx="0" cy="0" rx="16" ry="7" fill="#ffc107"/>
+        <rect x="-12" y="-2" width="24" height="4" rx="2" fill="#c62828"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="200" height="200" fill="url(#p)"/>
+</svg>

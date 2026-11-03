@@ -8,18 +8,21 @@ export function ProductCard({
   onAdicionar: (produto: Produto) => void;
 }) {
   return (
-    <div className="card h-100">
+    <div className="card h-100 product-card">
+      <div className="product-card__img">🌭</div>
       <div className="card-body d-flex flex-column">
         <h6 className="card-title">{produto.nome}</h6>
         <p className="card-text text-muted small flex-grow-1">{produto.descricao}</p>
         <div className="d-flex justify-content-between align-items-center">
-          <strong>R$ {Number(produto.preco).toFixed(2)}</strong>
+          <strong className="fs-5 text-danger">
+            R$ {Number(produto.preco).toFixed(2)}
+          </strong>
           <button
             className="btn btn-sm btn-primary"
             disabled={!produto.disponivel}
             onClick={() => onAdicionar(produto)}
           >
-            Adicionar
+            ➕ Adicionar
           </button>
         </div>
       </div>

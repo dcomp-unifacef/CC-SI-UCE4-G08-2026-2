@@ -9,14 +9,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <header className="bg-dark text-white py-3">
+      <header className="cd-header py-3">
         <div className="container d-flex justify-content-between align-items-center">
-          <span className="fw-bold">Chic Dog</span>
-          {usuario && <span>{usuario.nome}</span>}
+          <img src="/logo.svg" alt="Chic Dog" style={{ height: 32 }} />
+          {usuario && <span className="fw-medium">{usuario.nome}</span>}
         </div>
       </header>
-      <nav className="bg-light border-bottom py-2">
-        <div className="container d-flex gap-2 align-items-center">
+      <nav className="cd-nav py-2">
+        <div className="container d-flex gap-2 align-items-center flex-wrap">
           {staff && (
             <>
               <Link className="btn btn-sm btn-outline-dark" to="/garcom">

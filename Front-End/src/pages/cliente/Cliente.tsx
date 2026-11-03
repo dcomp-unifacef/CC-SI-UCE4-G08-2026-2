@@ -12,6 +12,7 @@ import { listarProdutos } from "../../api/produtos";
 import { ApiError } from "../../api/client";
 import { Layout } from "../../components/Layout";
 import { StatusBadge } from "../../components/StatusBadge";
+import { StatusProgressBar } from "../../components/StatusProgressBar";
 import { podeEditarItens } from "../../lib/status";
 import { adicionarItem as adicionarCarrinho, alterarQuantidade, calcularPrevia, type ItemCarrinho } from "../../lib/carrinho";
 import type { Pedido, Produto } from "../../types/api";
@@ -79,7 +80,7 @@ export default function Cliente() {
       setCarrinho([]);
     } catch (e) {
       if (e instanceof ApiError && e.status === 409 && e.detalhes?.idPedido) {
-        setAviso("A mesa já possui um pedido em andamento.");
+        setAviso("Esta mesa já tem um pedido em andamento. Você pode acrescentar itens a ele.");
         await carregar();
       } else {
         setErro(e instanceof ApiError ? e.message : "Falha ao criar pedido.");
@@ -102,7 +103,7 @@ export default function Cliente() {
       setCarrinho([]);
     } catch (e) {
       if (e instanceof ApiError && e.status === 409 && e.detalhes?.idPedido) {
-        setAviso("A mesa já possui um pedido em andamento.");
+        setAviso("Esta mesa já tem um pedido em andamento. Você pode acrescentar itens a ele.");
         await carregar();
       } else {
         setErro(e instanceof ApiError ? e.message : "Falha ao acrescentar.");
@@ -196,7 +197,7 @@ export default function Cliente() {
           <div className="d-flex justify-content-between">
             <strong>Prévia: R$ {calcularPrevia(carrinho).toFixed(2)}</strong>
             <button className="btn btn-success" disabled={enviando || carrinho.length === 0} onClick={enviarNovo}>
-              {enviando ? "Enviando..." : "Fazer pedido"}
+              {enviando ? "Enviando..." : "✅ Fazer pedido"}
             </button>
           </div>
         </>
@@ -208,6 +209,7 @@ export default function Cliente() {
             <strong>Status:</strong>
             <StatusBadge status={pedido.statusPedido} />
           </div>
+          <StatusProgressBar status={pedido.statusPedido} />
           <p>
             <strong>Total:</strong> R$ {Number(pedido.valorTotal).toFixed(2)}
           </p>
@@ -293,7 +295,7 @@ export default function Cliente() {
                 ))}
               </ul>
               <button className="btn btn-success" disabled={enviando || carrinho.length === 0} onClick={acrescentar}>
-                {enviando ? "Enviando..." : "Acrescentar ao pedido"}
+                {enviando ? "Enviando..." : "➕ Acrescentar ao pedido"}
               </button>
             </>
           )}

@@ -7,7 +7,21 @@ const CORES: Record<string, string> = {
   Cancelado: "danger",
 };
 
+const ICONES: Record<string, string> = {
+  Aberto: "📝",
+  "Em preparo": "👨‍🍳",
+  Pronto: "✅",
+  Entregue: "🍽️",
+  Pago: "💰",
+  Cancelado: "❌",
+};
+
 export function StatusBadge({ status }: { status: string }) {
   const cor = CORES[status] ?? "secondary";
-  return <span className={`badge text-bg-${cor}`}>{status}</span>;
+  const icone = ICONES[status] ?? "";
+  return (
+    <span className={`badge text-bg-${cor}`}>
+      {icone} {status}
+    </span>
+  );
 }

@@ -1,5 +1,9 @@
 import { Navigate, Route, Routes } from "react-router";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastProvider } from "./components/Toast";
+import { RouteTransition } from "./components/RouteTransition";
+import { lazy, Suspense } from "react";
+const HotDog3D = lazy(() => import("./components/HotDog3D").then((m) => ({ default: m.HotDog3D })));
 import { RotaProtegida } from "./routes/RotaProtegida";
 import Login from "./pages/Login";
 import GarcomLista from "./pages/garcom/GarcomLista";
@@ -11,7 +15,9 @@ import Cliente from "./pages/cliente/Cliente";
 export default function App() {
   return (
     <AuthProvider>
-      <Routes>
+      <ToastProvider>
+        <RouteTransition>
+        <Routes>
         <Route path="/login" element={<Login />} />
         <Route
           path="/garcom"
@@ -55,6 +61,11 @@ export default function App() {
         />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
+        </RouteTransition>
+        <Suspense fallback={null}>
+          <HotDog3D />
+        </Suspense>
+      </ToastProvider>
     </AuthProvider>
   );
 }

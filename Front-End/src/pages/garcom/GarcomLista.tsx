@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { listarPedidos } from "../../api/pedidos";
 import { StatusBadge } from "../../components/StatusBadge";
+import { CardSkeleton } from "../../components/Skeleton";
+import { EmptyState } from "../../components/EmptyState";
 import { Layout } from "../../components/Layout";
 
 export default function GarcomLista() {
@@ -21,15 +23,29 @@ export default function GarcomLista() {
 
   return (
     <Layout>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1>Pedidos</h1>
-        <button className="btn btn-primary" onClick={() => navigate("/garcom/novo")}>
-          Novo pedido
+      <div className="cd-hero mb-4">
+        <h1 className="cd-hero__title">Pedidos em andamento</h1>
+        <p className="cd-hero__subtitle">
+          Acompanhe as mesas, avance o preparo e crie novos pedidos em segundos.
+        </p>
+        <button
+          className="btn btn-lg cd-cta"
+          onClick={() => navigate("/garcom/novo")}
+        >
+          ➕ Novo pedido
         </button>
       </div>
       {erro && <div className="alert alert-danger">{erro}</div>}
-      {carregando && <p>Carregando...</p>}
-      <div className="row g-3">
+      {carregando && (
+        <div className="row g-3">
+          {[1, 2, 3].map((i) => (
+            <div className="col-md-4" key={i}>
+              <CardSkeleton />
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="row g-3 stagger">
         {ativos.map((p) => (
           <div className="col-md-4" key={p.idPedido}>
             <div
@@ -51,6 +67,13 @@ export default function GarcomLista() {
           </div>
         ))}
       </div>
+      {!carregando && ativos.length === 0 && (
+        <EmptyState
+          titulo="Nenhum pedido em andamento"
+          descricao="Crie o primeiro pedido clicando em “Novo pedido”."
+          icone="📋"
+        />
+      )}
     </Layout>
   );
 }

@@ -84,7 +84,7 @@ export default function GarcomNovo() {
     } catch (e) {
       if (e instanceof ApiError && e.status === 409 && e.detalhes?.idPedido) {
         navigate(`/garcom/pedidos/${e.detalhes.idPedido}`, {
-          state: { aviso: "mesa já possui pedido em andamento" },
+          state: { aviso: "Esta mesa já tem um pedido em andamento. Você foi redirecionado para ele, onde pode acrescentar itens." },
         });
       } else {
         setErro(e instanceof ApiError ? e.message : "Falha ao criar pedido.");
@@ -156,7 +156,7 @@ export default function GarcomNovo() {
       <div className="d-flex justify-content-between align-items-center">
         <strong>Prévia: R$ {calcularPrevia(carrinho).toFixed(2)}</strong>
         <button className="btn btn-success" disabled={enviando} onClick={enviar}>
-          {enviando ? "Enviando..." : "Criar pedido"}
+          {enviando ? "Enviando..." : "✅ Criar pedido"}
         </button>
       </div>
     </Layout>

@@ -10,8 +10,10 @@ import {
 import { listarProdutos } from "../../api/produtos";
 import { ApiError } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
+import { StatusProgressBar } from "../../components/StatusProgressBar";
 import { Layout } from "../../components/Layout";
 import { acoesDeStatus, podeEditarItens } from "../../lib/status";
+import { dispararConfetti } from "../../lib/confetti";
 import type { Pedido, Produto } from "../../types/api";
 
 export default function GarcomPedido() {
@@ -48,7 +50,9 @@ export default function GarcomPedido() {
     setOcupado(true);
     setErro(null);
     try {
-      setPedido(await atualizarPedido(pedido.idPedido, { statusPedido: novoStatus }));
+      const atualizado = await atualizarPedido(pedido.idPedido, { statusPedido: novoStatus });
+      setPedido(atualizado);
+      if (novoStatus === "Entregue") dispararConfetti();
     } catch (e) {
       if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
         setErro(e.message);
@@ -114,10 +118,17 @@ export default function GarcomPedido() {
     <Layout>
       {aviso && <div className="alert alert-info">{aviso}</div>}
       {erro && <div className="alert alert-danger">{erro}</div>}
+      {!editavel && (
+        <div className="alert alert-info">
+          Os itens não podem mais ser alterados: o pedido já avançou para{" "}
+          <strong>{pedido.statusPedido}</strong>.
+        </div>
+      )}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1>Mesa {pedido.numeroMesa}</h1>
         <StatusBadge status={pedido.statusPedido} />
       </div>
+      <StatusProgressBar status={pedido.statusPedido} />
       <p>
         <strong>Total:</strong> R$ {Number(pedido.valorTotal).toFixed(2)}
       </p>
