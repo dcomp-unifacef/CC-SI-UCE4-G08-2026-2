@@ -5,6 +5,7 @@ import pedidoRepository from "../repositories/pedidoRepository";
 import produtoRepository from "../repositories/produtoRepository";
 import usuarioRepository from "../repositories/usuarioRepository";
 import type { UsuarioAutenticado } from "../utils/jwt";
+import { decidirCriacao, podeEditarItens } from "../utils/pedidoRules";
 import {
   ROLE_CLIENTE,
   ROLE_GARCOM,
@@ -38,7 +39,7 @@ const TRANSICOES_STATUS: Record<string, readonly string[]> = {
   Cancelado: [],
 };
 
-const STATUS_EDICAO_ITENS = ["Aberto", "Em preparo"];
+
 
 // O painel da cozinha só avança o preparo; pagamento e entrega são de outros perfis.
 const STATUS_PERMITIDOS_COZINHA = ["Em preparo", "Pronto"];
@@ -103,7 +104,7 @@ async function ensureUsuarioComTipo(
 }
 
 function ensureAcessoAoPedido(
-  pedido: { idCliente: number },
+  pedido: { idCliente: number | null },
   usuario?: UsuarioAutenticado,
 ) {
   if (
@@ -116,9 +117,9 @@ function ensureAcessoAoPedido(
 }
 
 function ensureItensEditaveis(pedido: { statusPedido: string }) {
-  if (!STATUS_EDICAO_ITENS.includes(pedido.statusPedido)) {
+  if (!podeEditarItens(pedido.statusPedido)) {
     throw new AppError(
-      "Os itens só podem ser alterados enquanto o pedido está em Aberto ou Em preparo.",
+      "Os itens só podem ser alterados enquanto o pedido está em Aberto.",
       409,
     );
   }
@@ -197,24 +198,46 @@ async function findById(id: number, usuario?: UsuarioAutenticado) {
   return pedido;
 }
 
+async function findAtivoPorMesa(numeroMesa: number, usuario?: UsuarioAutenticado) {
+  const pedido = await pedidoRepository.findAtivoPorMesa(numeroMesa);
+
+  if (!pedido) {
+    throw new AppError("Não há pedido ativo nesta mesa.", 404);
+  }
+
+  ensureAcessoAoPedido(pedido, usuario);
+
+  return pedido;
+}
+
 async function create(data: unknown, usuario?: UsuarioAutenticado) {
   ensureNaoCozinheiro(usuario, "criar pedidos");
 
   const input = getObjectData(data);
+  const ehCliente = Boolean(usuario && isClienteRole(usuario.tipo));
+  const numeroMesa = validatePositiveInt(input.numeroMesa, "numeroMesa");
 
-  const idCliente =
-    usuario && isClienteRole(usuario.tipo)
-      ? usuario.idUsuario
-      : validatePositiveInt(input.idCliente, "idCliente");
-  const idGarcom = validatePositiveInt(input.idGarcom, "idGarcom");
-  const statusPedido =
-    input.statusPedido === undefined
+  let idCliente: number | undefined;
+  let idGarcom: number | undefined;
+
+  if (ehCliente) {
+    idCliente = usuario!.idUsuario;
+  } else {
+    idGarcom = validatePositiveInt(input.idGarcom, "idGarcom");
+    await ensureUsuarioComTipo(idGarcom, "Garçom", ROLE_GARCOM);
+
+    if (input.idCliente !== undefined) {
+      idCliente = validatePositiveInt(input.idCliente, "idCliente");
+      await ensureUsuarioComTipo(idCliente, "Cliente", ROLE_CLIENTE);
+    }
+  }
+
+  const statusPedido = ehCliente
+    ? STATUS_INICIAL
+    : input.statusPedido === undefined
       ? STATUS_INICIAL
       : validarStatus(input.statusPedido);
   const itensSolicitados = validarItens(input.itens);
-
-  await ensureUsuarioComTipo(idCliente, "Cliente", ROLE_CLIENTE);
-  await ensureUsuarioComTipo(idGarcom, "Garçom", ROLE_GARCOM);
 
   const idsProdutos = [...new Set(itensSolicitados.map((i) => i.idProduto))];
   const produtos = await produtoRepository.findByIds(idsProdutos);
@@ -248,13 +271,49 @@ async function create(data: unknown, usuario?: UsuarioAutenticado) {
     itens.reduce((total, item) => total + item.subTotal, 0).toFixed(2),
   );
 
-  return pedidoRepository.create({
-    valorTotal,
-    statusPedido,
-    idCliente,
-    idGarcom,
-    itens,
-  });
+  const ativo = await pedidoRepository.findAtivoPorMesa(numeroMesa);
+  const decisao = decidirCriacao(ativo, { ehCliente });
+
+  if (decisao.tipo === "conflito") {
+    throw new AppError("Esta mesa já possui um pedido em andamento.", 409, {
+      idPedido: decisao.idPedido,
+    });
+  }
+
+  if (decisao.tipo === "entrar") {
+    const pedido = await pedidoRepository.entrarNoPedido(
+      decisao.idPedido,
+      usuario!.idUsuario,
+      itens,
+    );
+
+    return { pedido, criado: false };
+  }
+
+  try {
+    const pedido = await pedidoRepository.create({
+      valorTotal,
+      statusPedido,
+      numeroMesa,
+      idCliente,
+      idGarcom,
+      itens,
+    });
+
+    return { pedido, criado: true };
+  } catch (error) {
+    if ((error as { code?: string }).code === "P2002") {
+      const existente = await pedidoRepository.findAtivoPorMesa(numeroMesa);
+
+      throw new AppError(
+        "Esta mesa já possui um pedido em andamento.",
+        409,
+        existente ? { idPedido: existente.idPedido } : {},
+      );
+    }
+
+    throw error;
+  }
 }
 
 async function update(
@@ -441,6 +500,7 @@ async function remove(id: number) {
 export default {
   findAll,
   findById,
+  findAtivoPorMesa,
   create,
   update,
   addItem,

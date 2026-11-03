@@ -33,9 +33,31 @@ export async function retrieveOne(
   }
 }
 
+export async function retrieveAtivoPorMesa(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    return res.json(
+      await service.findAtivoPorMesa(
+        parseId(req.params.numeroMesa),
+        obterUsuario(req),
+      ),
+    );
+  } catch (error) {
+    return next(error);
+  }
+}
+
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    return res.status(201).json(await service.create(req.body, obterUsuario(req)));
+    const { pedido, criado } = await service.create(
+      req.body,
+      obterUsuario(req),
+    );
+
+    return res.status(criado ? 201 : 200).json(pedido);
   } catch (error) {
     return next(error);
   }

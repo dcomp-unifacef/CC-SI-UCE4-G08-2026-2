@@ -33,12 +33,13 @@ model Pedido {
   valorTotal   Decimal      @db.Decimal(10, 2)
   dataHora     DateTime     @default(now())
   statusPedido String       @db.VarChar(80)
-  idCliente    Int
-  idGarcom     Int
+  numeroMesa   Int
+  idCliente    Int?
+  idGarcom     Int?
   itens        ItemPedido[]
   pagamento    Pagamento?
-  cliente      Usuario      @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
-  garcom       Usuario      @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
+  cliente      Usuario?     @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
+  garcom       Usuario?     @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
 
   @@map("pedido")
 }

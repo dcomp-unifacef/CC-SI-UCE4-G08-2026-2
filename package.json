@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.tools.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "node --import tsx --test Back-End/tests/errors.test.ts Back-End/tests/jwt.test.ts Back-End/tests/validation.test.ts",
+    "test": "node --import tsx --test Back-End/tests/*.test.ts",
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate deploy"
   },

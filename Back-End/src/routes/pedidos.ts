@@ -9,6 +9,7 @@ import {
 const router = Router();
 
 router.get("/", authenticate, controller.retrieveAll);
+router.get("/mesa/:numeroMesa/ativo", authenticate, controller.retrieveAtivoPorMesa);
 router.get("/:id", authenticate, controller.retrieveOne);
 router.post("/", authenticate, controller.create);
 router.put("/:id", authenticate, authorizeStaff, controller.update);

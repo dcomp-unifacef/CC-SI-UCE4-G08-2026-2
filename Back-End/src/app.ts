@@ -1,6 +1,6 @@
 ﻿import express from "express";
 import { env } from "./config/env";
-import { AppError } from "./errors/AppError";
+import { formatarErro } from "./utils/httpError";
 import pagamentosRouter from "./routes/pagamentos";
 import pedidosRouter from "./routes/pedidos";
 import produtosRouter from "./routes/produtos";
@@ -45,20 +45,14 @@ app.use((_req, res) => {
   return res.status(404).json({ erro: "Rota não encontrada." });
 });
 
-app.use((error: any, _req: any, res: any, _next: any) => {
-  if (error instanceof AppError) {
-    return res.status(error.statusCode).json({ erro: error.message });
+app.use((error: unknown, _req: any, res: any, _next: any) => {
+  const { status, body } = formatarErro(error);
+
+  if (status >= 500) {
+    console.error(error);
   }
 
-  if (error instanceof SyntaxError && "body" in error) {
-    return res.status(400).json({ erro: "JSON inválido no corpo da requisição." });
-  }
-
-  console.error(error);
-
-  return res.status(500).json({
-    erro: "Erro interno do servidor.",
-  });
+  return res.status(status).json(body);
 });
 
 app.listen(env.port, () => {

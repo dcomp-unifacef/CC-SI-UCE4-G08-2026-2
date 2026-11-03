@@ -39,7 +39,7 @@ function validarFormaPagamento(value: unknown): string {
 }
 
 function ensureAcessoAoPagamento(
-  pagamento: { pedido: { idCliente: number } },
+  pagamento: { pedido: { idCliente: number | null } },
   usuario?: UsuarioAutenticado,
 ) {
   if (

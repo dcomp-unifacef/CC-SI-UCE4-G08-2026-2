@@ -4,8 +4,9 @@ export interface CreateItemPedidoDto {
 }
 
 export interface CreatePedidoDto {
-  idCliente: number;
-  idGarcom: number;
+  numeroMesa: number;
+  idCliente?: number;
+  idGarcom?: number;
   statusPedido?: string;
   itens: CreateItemPedidoDto[];
 }

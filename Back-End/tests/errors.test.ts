@@ -12,6 +12,12 @@ test("AppError guarda mensagem e status", () => {
   assert.ok(error instanceof Error);
 });
 
+test("AppError guarda detalhes opcionais", () => {
+  const error = new AppError("Mesa ocupada.", 409, { idPedido: 7 });
+
+  assert.deepEqual(error.details, { idPedido: 7 });
+});
+
 test("NotFoundError usa status 404", () => {
   const error = new NotFoundError();
 

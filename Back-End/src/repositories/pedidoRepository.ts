@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../database/client";
 import { UpdatePedidoDto } from "../dto/pedido/updatePedidoDto";
+import { STATUS_ENCERRADOS } from "../utils/pedidoRules";
 
 const pedidoInclude = {
   cliente: { select: { idUsuario: true, nome: true } },
@@ -30,8 +31,9 @@ export interface ItemPedidoAtualizacao {
 interface CreatePedidoData {
   valorTotal: number;
   statusPedido: string;
-  idCliente: number;
-  idGarcom: number;
+  numeroMesa: number;
+  idCliente?: number | null;
+  idGarcom?: number | null;
   itens: ItemPedidoCalculado[];
 }
 
@@ -71,6 +73,17 @@ function findById(idPedido: number) {
   });
 }
 
+function findAtivoPorMesa(numeroMesa: number) {
+  return prisma.pedido.findFirst({
+    where: {
+      numeroMesa,
+      statusPedido: { notIn: [...STATUS_ENCERRADOS] },
+    },
+    include: pedidoInclude,
+    orderBy: { dataHora: "desc" },
+  });
+}
+
 function findItemById(idPedido: number, idItemPedido: number) {
   return prisma.itemPedido.findFirst({
     where: { idItemPedido, idPedido },
@@ -86,11 +99,36 @@ function create(data: CreatePedidoData) {
     data: {
       valorTotal: data.valorTotal,
       statusPedido: data.statusPedido,
-      idCliente: data.idCliente,
-      idGarcom: data.idGarcom,
+      numeroMesa: data.numeroMesa,
+      idCliente: data.idCliente ?? null,
+      idGarcom: data.idGarcom ?? null,
       itens: { create: data.itens },
     },
     include: pedidoInclude,
+  });
+}
+
+function entrarNoPedido(
+  idPedido: number,
+  idCliente: number,
+  itens: ItemPedidoCalculado[],
+) {
+  return prisma.$transaction(async (tx) => {
+    await tx.pedido.update({
+      where: { idPedido },
+      data: { idCliente },
+    });
+
+    await tx.itemPedido.createMany({
+      data: itens.map((item) => ({ ...item, idPedido })),
+    });
+
+    await recalcularTotal(tx, idPedido);
+
+    return tx.pedido.findUniqueOrThrow({
+      where: { idPedido },
+      include: pedidoInclude,
+    });
   });
 }
 
@@ -162,9 +200,11 @@ function remove(idPedido: number) {
 export default {
   findAll,
   findById,
+  findAtivoPorMesa,
   findItemById,
   countItens,
   create,
+  entrarNoPedido,
   update,
   addItem,
   updateItem,
