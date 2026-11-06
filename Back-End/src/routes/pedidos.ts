@@ -7,7 +7,6 @@ const router = Router();
 
 router.use(autenticar);
 
-//
 router.get("/", controller.retrieveAll);
 router.get(
   "/fila",
