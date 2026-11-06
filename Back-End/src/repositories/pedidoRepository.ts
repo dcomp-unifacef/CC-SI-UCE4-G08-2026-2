@@ -1,5 +1,5 @@
 import { prisma } from "../database/client";
-
+//
 const usuarioResumoSelect = {
   idUsuario: true,
   nome: true,
