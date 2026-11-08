@@ -74,6 +74,7 @@ export default function Cliente() {
     try {
       const criado = await criarPedido({
         numeroMesa: mesa,
+        idCliente: usuario?.id ?? undefined,
         itens: carrinho.map((i) => ({ idProduto: i.idProduto, quantidade: i.quantidade })),
       });
       setPedido(criado);
@@ -95,15 +96,18 @@ export default function Cliente() {
     setEnviando(true);
     setErro(null);
     try {
-      const atualizado = await criarPedido({
-        numeroMesa: mesa,
-        itens: carrinho.map((i) => ({ idProduto: i.idProduto, quantidade: i.quantidade })),
-      });
+      let atualizado = pedido;
+      for (const item of carrinho) {
+        atualizado = await adicionarItem(atualizado.idPedido, {
+          idProduto: item.idProduto,
+          quantidade: item.quantidade,
+        });
+      }
       setPedido(atualizado);
       setCarrinho([]);
     } catch (e) {
-      if (e instanceof ApiError && e.status === 409 && e.detalhes?.idPedido) {
-        setAviso("Esta mesa já tem um pedido em andamento. Você pode acrescentar itens a ele.");
+      if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
+        setErro(e.message);
         await carregar();
       } else {
         setErro(e instanceof ApiError ? e.message : "Falha ao acrescentar.");

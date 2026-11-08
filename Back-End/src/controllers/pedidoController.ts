@@ -113,6 +113,25 @@ export async function retrieveOne(
   }
 }
 
+export async function buscarAtivoDaMesa(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const numeroMesa = parseId(req.params.numeroMesa);
+    const pedido = await service.buscarAtivoDaMesa(numeroMesa);
+    if (!pedido) {
+      return res.status(404).json({
+        erro: "Não há pedido ativo para esta mesa.",
+      });
+    }
+    return res.json(pedido);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     return res
