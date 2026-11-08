@@ -9,6 +9,26 @@ import { AppError } from "./errors/AppError";
 
 const app = express();
 
+// Libera requisições cross-origin (ex.: front-end em outra porta).
+const corsOrigin = process.env.CORS_ORIGIN || "*";
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", corsOrigin);
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  );
+
+  if (_req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
+  return next();
+});
+
 app.use(express.json());
 
 app.use("/tipo-usuarios", tipoUsuariosRouter);

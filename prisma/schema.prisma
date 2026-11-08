@@ -49,6 +49,7 @@ model Pagamento {
   valor          Decimal  @db.Decimal(10, 2)
   dataHora       DateTime @default(now())
   formaPagamento String   @db.VarChar(80)
+  status         String   @db.VarChar(80) @default("Pago")
   idPedido       Int      @unique(map: "unq_pagamento_pedido")
   pedido         Pedido   @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
 

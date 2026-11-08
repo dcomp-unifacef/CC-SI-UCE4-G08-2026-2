@@ -165,6 +165,12 @@ async function findFila() {
   );
 }
 
+async function buscarAtivoDaMesa(numeroMesa: number) {
+  const pedido = await repository.findAtivoDaMesa(numeroMesa);
+  if (!pedido) return null;
+  return serializePedido(pedido);
+}
+
 async function findById(id: number, usuario?: UsuarioAutenticado) {
   const pedido = await buscarPedido(id);
 
@@ -191,6 +197,7 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
       ? null
       : validarTempoEstimado(input.tempoEstimado);
 
+  const numeroMesa = validarId(input.numeroMesa, "numeroMesa");
   const itensInput = validarItens(input.itens);
 
   await garantirUsuarioAtivo(idCliente, "Cliente");
@@ -202,19 +209,30 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   const itens = await montarItens(itensInput);
   const valorTotal = calcularTotal(itens);
 
-  const pedido = await repository.create(
-    {
-      idCliente,
-      idGarcom,
-      idCozinheiro,
-      tempoEstimado,
-      statusPedido: "Pendente",
-      valorTotal,
-    },
-    itens,
-  );
+  try {
+    const pedido = await repository.create(
+      {
+        idCliente,
+        idGarcom,
+        idCozinheiro,
+        tempoEstimado,
+        statusPedido: "Pendente",
+        valorTotal,
+        numeroMesa,
+      },
+      itens,
+    );
 
-  return serializePedido(pedido);
+    return serializePedido(pedido);
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      throw new AppError(
+        "Já existe um pedido ativo para esta mesa. Finalize ou cancele o pedido atual antes de criar um novo.",
+        409,
+      );
+    }
+    throw error;
+  }
 }
 
 async function update(id: number, data: unknown) {
@@ -435,6 +453,7 @@ async function cancelar(id: number, usuario: UsuarioAutenticado) {
 export default {
   findAll,
   findFila,
+  buscarAtivoDaMesa,
   findById,
   create,
   update,

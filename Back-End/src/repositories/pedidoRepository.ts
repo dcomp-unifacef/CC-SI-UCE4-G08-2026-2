@@ -11,7 +11,6 @@ const usuarioResumoSelect = {
 const pedidoInclude = {
   cliente: { select: usuarioResumoSelect },
   garcom: { select: usuarioResumoSelect },
-  cozinheiro: { select: usuarioResumoSelect },
   itens: {
     include: {
       produto: {
@@ -43,6 +42,7 @@ export interface DadosPedido {
   tempoEstimado?: number | null;
   statusPedido?: string;
   valorTotal?: number;
+  numeroMesa?: number;
 }
 
 export interface FiltrosPedido {
@@ -92,6 +92,19 @@ function findById(idPedido: number) {
   });
 }
 
+function findAtivoDaMesa(numeroMesa: number) {
+  return prisma.pedido.findFirst({
+    where: {
+      numeroMesa,
+      statusPedido: {
+        notIn: ["Pago", "Cancelado"],
+      },
+    },
+    include: pedidoInclude,
+    orderBy: { dataHora: "desc" },
+  });
+}
+
 function findProdutosByIds(idsProduto: number[]) {
   if (idsProduto.length === 0) return Promise.resolve([]);
 
@@ -134,12 +147,11 @@ function create(dados: DadosPedido, itens: ItemPedidoPersistido[]) {
   return prisma.$transaction(async (tx) => {
     const pedido = await tx.pedido.create({
       data: {
-        idCliente: dados.idCliente as number,
-        idGarcom: dados.idGarcom as number,
-        idCozinheiro: dados.idCozinheiro ?? null,
-        tempoEstimado: dados.tempoEstimado ?? null,
+        cliente: { connect: { idUsuario: dados.idCliente as number } },
+        garcom: { connect: { idUsuario: dados.idGarcom as number } },
         statusPedido: dados.statusPedido ?? "Pendente",
         valorTotal: dados.valorTotal ?? 0,
+        numeroMesa: dados.numeroMesa as number,
       },
     });
 
@@ -163,9 +175,36 @@ function update(
   itens?: ItemPedidoPersistido[],
 ) {
   return prisma.$transaction(async (tx) => {
+    const dataPrisma: Record<string, unknown> = {};
+
+    if (dados.idCliente !== undefined) {
+      dataPrisma.cliente = { connect: { idUsuario: dados.idCliente } };
+    }
+    if (dados.idGarcom !== undefined) {
+      dataPrisma.garcom = { connect: { idUsuario: dados.idGarcom } };
+    }
+    if (dados.idCozinheiro !== undefined) {
+      dataPrisma.cozinheiro =
+        dados.idCozinheiro === null
+          ? { disconnect: true }
+          : { connect: { idUsuario: dados.idCozinheiro } };
+    }
+    if (dados.tempoEstimado !== undefined) {
+      dataPrisma.tempoEstimado = dados.tempoEstimado;
+    }
+    if (dados.statusPedido !== undefined) {
+      dataPrisma.statusPedido = dados.statusPedido;
+    }
+    if (dados.valorTotal !== undefined) {
+      dataPrisma.valorTotal = dados.valorTotal;
+    }
+    if (dados.numeroMesa !== undefined) {
+      dataPrisma.numeroMesa = dados.numeroMesa;
+    }
+
     await tx.pedido.update({
       where: { idPedido },
-      data: dados,
+      data: dataPrisma as any,
     });
 
     if (itens !== undefined) {
@@ -246,6 +285,7 @@ function removeItem(idItemPedido: number, idPedido: number) {
 export default {
   findAll,
   findById,
+  findAtivoDaMesa,
   findProdutosByIds,
   findUsuarioById,
   create,

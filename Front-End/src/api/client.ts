@@ -23,7 +23,8 @@ export function definirTratadorSessaoExpirada(handler: (() => void) | null) {
   tratadorSessaoExpirada = handler;
 }
 
-const BASE = "/api";
+const BASE =
+  (import.meta.env.VITE_API_URL as string | undefined) ?? "/api";
 
 export async function apiFetch<T>(
   caminho: string,

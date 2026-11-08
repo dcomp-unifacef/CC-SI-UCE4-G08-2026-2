@@ -13,6 +13,10 @@ router.get(
   autorizar(PERFIS.GARCOM, PERFIS.COZINHEIRO, PERFIS.GERENTE),
   controller.retrieveFila,
 );
+router.get(
+  "/mesa/:numeroMesa/ativo",
+  controller.buscarAtivoDaMesa,
+);
 router.get("/:id", controller.retrieveOne);
 
 router.post(

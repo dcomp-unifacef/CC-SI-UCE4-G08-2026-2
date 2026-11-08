@@ -4,7 +4,7 @@
   "description": "Sistema de automação de pedidos de restaurante (UCE - Grupo 08)",
   "main": "dist/src/app.js",
   "scripts": {
-    "dev": "prisma migrate deploy && tsx prisma/seed.ts && tsx Back-End/src/app.ts",
+    "dev": "prisma migrate deploy && tsx prisma/seed.ts && tsx Back-End/src/server.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/src/app.js",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.tools.json",
