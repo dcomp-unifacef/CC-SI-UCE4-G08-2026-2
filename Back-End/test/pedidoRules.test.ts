@@ -41,7 +41,7 @@ test("só permite editar pedidos pendentes", () => {
   assert.equal(podeEditarPedido("Cancelado"), false);
 });
 
-test("garçom envia para preparo e cancela apenas pedido pendente", () => {
+test("garçom envia para preparo e cancela pedidos (com motivo)", () => {
   assert.equal(
     perfilPodeAlterarStatus(PERFIS.GARCOM, "Pendente", "Em preparo"),
     true,
@@ -52,7 +52,7 @@ test("garçom envia para preparo e cancela apenas pedido pendente", () => {
   );
   assert.equal(
     perfilPodeAlterarStatus(PERFIS.GARCOM, "Em preparo", "Cancelado"),
-    false,
+    true,
   );
   assert.equal(
     perfilPodeAlterarStatus(PERFIS.GARCOM, "Em preparo", "Pronto"),
@@ -60,7 +60,7 @@ test("garçom envia para preparo e cancela apenas pedido pendente", () => {
   );
 });
 
-test("cozinheiro inicia e conclui a preparação", () => {
+test("cozinheiro inicia, conclui e cancela a preparação (com motivo)", () => {
   assert.equal(
     perfilPodeAlterarStatus(PERFIS.COZINHEIRO, "Pendente", "Em preparo"),
     true,
@@ -71,7 +71,7 @@ test("cozinheiro inicia e conclui a preparação", () => {
   );
   assert.equal(
     perfilPodeAlterarStatus(PERFIS.COZINHEIRO, "Em preparo", "Cancelado"),
-    false,
+    true,
   );
 });
 

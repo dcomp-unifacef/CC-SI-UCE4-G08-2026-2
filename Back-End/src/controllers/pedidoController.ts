@@ -52,6 +52,18 @@ function parseStatus(raw: unknown): string | string[] | undefined {
   throw new AppError("O filtro status é inválido.", 400);
 }
 
+function parseData(raw: unknown): string | undefined {
+  if (raw === undefined) return undefined;
+  if (typeof raw !== "string") return undefined;
+
+  // Formato esperado: YYYY-MM-DD
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    throw new AppError("O filtro data deve estar no formato YYYY-MM-DD.", 400);
+  }
+
+  return raw;
+}
+
 function getUsuario(req: Request): UsuarioAutenticado {
   if (!req.usuario) {
     throw new AppError("Usuário não autenticado.", 401);
@@ -76,6 +88,7 @@ export async function retrieveAll(
             req.query.idCozinheiro,
             "idCozinheiro",
           ),
+          data: parseData(req.query.data),
           page: parseOptionalInt(req.query.page, "page"),
           limit: parseOptionalInt(req.query.limit, "limit"),
         },
@@ -216,7 +229,7 @@ export async function removeItem(
 export async function cancel(req: Request, res: Response, next: NextFunction) {
   try {
     return res.json(
-      await service.cancelar(parseId(req.params.id), getUsuario(req)),
+      await service.cancelar(parseId(req.params.id), getUsuario(req), req.body.motivo),
     );
   } catch (error) {
     return next(error);

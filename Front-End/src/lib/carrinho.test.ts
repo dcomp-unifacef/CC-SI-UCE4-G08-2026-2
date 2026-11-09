@@ -25,8 +25,8 @@ test("alterarQuantidade para zero remove o item", () => {
 
 test("calcularPrevia soma e arredonda em duas casas", () => {
   const itens = [
-    { idProduto: 1, nome: "A", preco: 0.1, quantidade: 1 },
-    { idProduto: 2, nome: "B", preco: 0.2, quantidade: 1 },
+    { idProduto: 1, nome: "A", preco: 0.1, quantidade: 1, imagem: "" },
+    { idProduto: 2, nome: "B", preco: 0.2, quantidade: 1, imagem: "" },
   ];
 
   expect(calcularPrevia(itens)).toBe(0.3);

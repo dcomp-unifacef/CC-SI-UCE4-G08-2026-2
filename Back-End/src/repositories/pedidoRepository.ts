@@ -41,6 +41,7 @@ export interface DadosPedido {
   idCozinheiro?: number | null;
   tempoEstimado?: number | null;
   statusPedido?: string;
+  motivoCancelamento?: string | null;
   valorTotal?: number;
   numeroMesa?: number;
 }
@@ -50,6 +51,7 @@ export interface FiltrosPedido {
   idCliente?: number;
   idGarcom?: number;
   idCozinheiro?: number;
+  data?: string; // YYYY-MM-DD
   page?: number;
   limit?: number;
 }
@@ -67,6 +69,13 @@ function montarWhere(filtros: FiltrosPedido) {
   if (filtros.idGarcom !== undefined) where.idGarcom = filtros.idGarcom;
   if (filtros.idCozinheiro !== undefined) {
     where.idCozinheiro = filtros.idCozinheiro;
+  }
+
+  if (filtros.data) {
+    const data = filtros.data;
+    const inicio = `${data}T00:00:00.000Z`;
+    const fim = `${data}T23:59:59.999Z`;
+    where.dataHora = { gte: inicio, lte: fim };
   }
 
   return where;
@@ -114,6 +123,8 @@ function findProdutosByIds(idsProduto: number[]) {
       idProduto: true,
       nome: true,
       preco: true,
+      imagem: true,
+      descricao: true,
       disponivel: true,
     },
   });
@@ -147,7 +158,10 @@ function create(dados: DadosPedido, itens: ItemPedidoPersistido[]) {
   return prisma.$transaction(async (tx) => {
     const pedido = await tx.pedido.create({
       data: {
-        cliente: { connect: { idUsuario: dados.idCliente as number } },
+        cliente:
+          dados.idCliente !== null
+            ? { connect: { idUsuario: dados.idCliente } }
+            : undefined,
         garcom: { connect: { idUsuario: dados.idGarcom as number } },
         statusPedido: dados.statusPedido ?? "Pendente",
         valorTotal: dados.valorTotal ?? 0,

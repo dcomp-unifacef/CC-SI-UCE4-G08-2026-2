@@ -3,6 +3,7 @@ import { useLocation, useParams } from "react-router";
 import {
   buscarPedido,
   atualizarPedido,
+  cancelarPedido,
   adicionarItem,
   alterarItem,
   removerItem,
@@ -12,6 +13,7 @@ import { ApiError } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
 import { StatusProgressBar } from "../../components/StatusProgressBar";
 import { Layout } from "../../components/Layout";
+import { ProductCard } from "../../components/ProductCard";
 import { acoesDeStatus, podeEditarItens } from "../../lib/status";
 import { dispararConfetti } from "../../lib/confetti";
 import type { Pedido, Produto } from "../../types/api";
@@ -46,13 +48,26 @@ export default function GarcomPedido() {
 
   async function executarAcao(novoStatus: string, confirmar?: boolean) {
     if (!pedido) return;
+
+    let motivo: string | undefined;
+    if (novoStatus === "Cancelado") {
+      const digitado = window.prompt("Informe o motivo do cancelamento:");
+      if (!digitado || digitado.trim().length === 0) return;
+      motivo = digitado.trim();
+    }
+
     if (confirmar && !window.confirm("Tem certeza?")) return;
     setOcupado(true);
     setErro(null);
     try {
-      const atualizado = await atualizarPedido(pedido.idPedido, { statusPedido: novoStatus });
+      let atualizado: Pedido;
+      if (novoStatus === "Cancelado") {
+        atualizado = await cancelarPedido(pedido.idPedido, { motivo: motivo!.trim() });
+      } else {
+        atualizado = await atualizarPedido(pedido.idPedido, { statusPedido: novoStatus });
+        if (novoStatus === "Entregue") dispararConfetti();
+      }
       setPedido(atualizado);
-      if (novoStatus === "Entregue") dispararConfetti();
     } catch (e) {
       if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
         setErro(e.message);
@@ -166,9 +181,11 @@ export default function GarcomPedido() {
               .filter((p) => p.disponivel)
               .map((p) => (
                 <div className="col-md-3" key={p.idProduto}>
-                  <button className="btn btn-outline-primary w-100" disabled={ocupado} onClick={() => adicionar(p)}>
-                    {p.nome} — R$ {Number(p.preco).toFixed(2)}
-                  </button>
+                  <ProductCard
+                    produto={p}
+                    onAdicionar={adicionar}
+                    disabled={ocupado}
+                  />
                 </div>
               ))}
           </div>

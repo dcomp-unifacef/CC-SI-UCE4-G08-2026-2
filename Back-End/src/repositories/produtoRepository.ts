@@ -22,7 +22,10 @@ function findById(idProduto: number) {
 
 function create(data: CreateProdutoDto) {
   return prisma.produto.create({
-    data,
+    data: {
+      ...data,
+      imagem: data.imagem ?? "",
+    },
   });
 }
 

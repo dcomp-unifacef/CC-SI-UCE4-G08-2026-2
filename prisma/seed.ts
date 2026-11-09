@@ -51,15 +51,19 @@ async function garantirProduto(
   preco: number,
   descricao: string,
   disponivel = true,
+  imagem = "",
 ) {
   const existente = await prisma.produto.findFirst({ where: { nome } });
 
   if (existente) {
-    return existente;
+    return prisma.produto.update({
+      where: { idProduto: existente.idProduto },
+      data: { preco, descricao, disponivel, imagem },
+    });
   }
 
   return prisma.produto.create({
-    data: { nome, preco, descricao, disponivel },
+    data: { nome, preco, descricao, disponivel, imagem },
   });
 }
 
@@ -102,21 +106,43 @@ async function main() {
       nome: "Cachorro-quente",
       preco: 12.5,
       descricao: "Pão, salsicha e molho especial",
+      imagem: "/img/cachorro-quente.svg",
     },
     {
       nome: "X-Salada",
       preco: 18.9,
       descricao: "Pão, hambúrguer, queijo, alface e tomate",
+      imagem: "/img/x-salada.svg",
     },
     {
       nome: "Batata frita",
       preco: 9.9,
       descricao: "Porção individual de batata frita",
+      imagem: "/img/batata-frita.svg",
     },
     {
       nome: "Refrigerante lata",
       preco: 6,
       descricao: "Lata de 350 ml",
+      imagem: "/img/refrigerante-lata.svg",
+    },
+    {
+      nome: "X-Bacon",
+      preco: 24.9,
+      descricao: "Hambúrguer, queijo, bacon crocante, alface e tomate",
+      imagem: "/img/x-bacon.svg",
+    },
+    {
+      nome: "Suco natural",
+      preco: 6.5,
+      descricao: "Suco natural de laranja, 300 ml",
+      imagem: "/img/suco-natural.svg",
+    },
+    {
+      nome: "Pudim",
+      preco: 6.9,
+      descricao: "Pudim de leite condensado com calda de caramelo",
+      imagem: "/img/pudim.svg",
     },
   ];
 
@@ -125,6 +151,8 @@ async function main() {
       produto.nome,
       produto.preco,
       produto.descricao,
+      true,
+      produto.imagem,
     );
   }
 

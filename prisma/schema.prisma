@@ -36,6 +36,7 @@ model Pedido {
   numeroMesa   Int
   idCliente    Int?
   idGarcom     Int?
+  motivoCancelamento String? @db.VarChar(255)
   itens        ItemPedido[]
   pagamento    Pagamento?
   cliente      Usuario?     @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
@@ -61,6 +62,7 @@ model Produto {
   nome        String       @db.VarChar(80)
   preco       Decimal      @db.Decimal(10, 2)
   descricao   String       @db.VarChar(100)
+  imagem      String       @db.VarChar(255)
   disponivel  Boolean      @default(true)
   itensPedido ItemPedido[]
 

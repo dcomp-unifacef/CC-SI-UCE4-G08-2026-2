@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#fdf6e3"/>
+  <path d="M150 250 L150 140 Q200 120 250 140 L250 250 Z" fill="#ff9800"/>
+  <ellipse cx="200" cy="140" rx="50" ry="14" fill="#f57c00"/>
+  <rect x="158" y="250" width="84" height="22" rx="11" fill="#e65100"/>
+  <circle cx="180" cy="155" r="10" fill="#fff9c4" opacity="0.9"/>
+  <circle cx="220" cy="150" r="10" fill="#fff9c4" opacity="0.9"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Arial" font-size="14" fill="#6b4a22">Suco natural</text>
+</svg>

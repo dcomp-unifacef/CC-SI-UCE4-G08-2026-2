@@ -2,12 +2,20 @@ export interface ItemCarrinho {
   idProduto: number;
   nome: string;
   preco: number;
+  imagem: string;
   quantidade: number;
 }
 
+import { resolverImagem } from "./imagens";
+
 export function adicionarItem(
   itens: ItemCarrinho[],
-  produto: { idProduto: number; nome: string; preco: string | number },
+  produto: {
+    idProduto: number;
+    nome: string;
+    preco: string | number;
+    imagem?: string;
+  },
   quantidade = 1,
 ): ItemCarrinho[] {
   const preco = Number(produto.preco);
@@ -21,7 +29,16 @@ export function adicionarItem(
     );
   }
 
-  return [...itens, { idProduto: produto.idProduto, nome: produto.nome, preco, quantidade }];
+  return [
+    ...itens,
+    {
+      idProduto: produto.idProduto,
+      nome: produto.nome,
+      preco,
+      imagem: resolverImagem(produto.nome, produto.imagem),
+      quantidade,
+    },
+  ];
 }
 
 export function alterarQuantidade(

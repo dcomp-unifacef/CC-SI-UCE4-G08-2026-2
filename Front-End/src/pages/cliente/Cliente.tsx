@@ -13,6 +13,8 @@ import { ApiError } from "../../api/client";
 import { Layout } from "../../components/Layout";
 import { StatusBadge } from "../../components/StatusBadge";
 import { StatusProgressBar } from "../../components/StatusProgressBar";
+import { ProductCard } from "../../components/ProductCard";
+import { CartItem } from "../../components/CartItem";
 import { podeEditarItens } from "../../lib/status";
 import { adicionarItem as adicionarCarrinho, alterarQuantidade, calcularPrevia, type ItemCarrinho } from "../../lib/carrinho";
 import type { Pedido, Produto } from "../../types/api";
@@ -171,31 +173,28 @@ export default function Cliente() {
               .filter((p) => p.disponivel)
               .map((p) => (
                 <div className="col-md-3" key={p.idProduto}>
-                  <button
-                    className="btn btn-outline-primary w-100"
-                    onClick={() => setCarrinho((c) => adicionarCarrinho(c, p))}
-                  >
-                    {p.nome} — R$ {Number(p.preco).toFixed(2)}
-                  </button>
+                  <ProductCard
+                    produto={p}
+                    onAdicionar={(prod) =>
+                      setCarrinho((c) => adicionarCarrinho(c, prod))
+                    }
+                  />
                 </div>
               ))}
           </div>
           <h3 className="mt-4">Carrinho</h3>
           <ul className="list-group mb-3">
             {carrinho.map((i) => (
-              <li key={i.idProduto} className="list-group-item d-flex justify-content-between">
-                <span>
-                  {i.nome} x {i.quantidade}
-                </span>
-                <div className="d-flex gap-1">
-                  <button className="btn btn-sm btn-outline-secondary" onClick={() => setCarrinho((c) => alterarQuantidade(c, i.idProduto, i.quantidade - 1))}>
-                    −
-                  </button>
-                  <button className="btn btn-sm btn-outline-secondary" onClick={() => setCarrinho((c) => alterarQuantidade(c, i.idProduto, i.quantidade + 1))}>
-                    +
-                  </button>
-                </div>
-              </li>
+              <CartItem
+                key={i.idProduto}
+                item={i}
+                onAlterar={(id, q) =>
+                  setCarrinho((c) => alterarQuantidade(c, id, q))
+                }
+                onRemover={(id) =>
+                  setCarrinho((c) => c.filter((x) => x.idProduto !== id))
+                }
+              />
             ))}
           </ul>
           <div className="d-flex justify-content-between">
@@ -260,9 +259,11 @@ export default function Cliente() {
                   .filter((p) => p.disponivel)
                   .map((p) => (
                     <div className="col-md-3" key={p.idProduto}>
-                      <button className="btn btn-outline-primary w-100" disabled={enviando} onClick={() => adicionarProduto(p)}>
-                        {p.nome} — R$ {Number(p.preco).toFixed(2)}
-                      </button>
+                      <ProductCard
+                        produto={p}
+                        onAdicionar={adicionarProduto}
+                        disabled={enviando}
+                      />
                     </div>
                   ))}
               </div>
@@ -277,18 +278,18 @@ export default function Cliente() {
                   .filter((p) => p.disponivel)
                   .map((p) => (
                     <div className="col-md-3" key={p.idProduto}>
-                      <button
-                        className="btn btn-outline-primary w-100"
-                        onClick={() => setCarrinho((c) => adicionarCarrinho(c, p))}
-                      >
-                        {p.nome} — R$ {Number(p.preco).toFixed(2)}
-                      </button>
+                      <ProductCard
+                        produto={p}
+                        onAdicionar={(prod) =>
+                          setCarrinho((c) => adicionarCarrinho(c, prod))
+                        }
+                      />
                     </div>
                   ))}
               </div>
               <ul className="list-group mb-3">
                 {carrinho.map((i) => (
-                  <li key={i.idProduto} className="list-group-item d-flex justify-content-between">
+                  <li key={i.idProduto} className="list-group-item d-flex justify-content-between align-items-center">
                     <span>
                       {i.nome} x {i.quantidade}
                     </span>

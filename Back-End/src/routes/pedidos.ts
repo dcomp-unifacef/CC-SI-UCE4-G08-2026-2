@@ -27,7 +27,7 @@ router.post(
 
 router.put(
   "/:id",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.COZINHEIRO, PERFIS.GERENTE),
   controller.update,
 );
 
@@ -39,13 +39,13 @@ router.patch(
 
 router.patch(
   "/:id/cancelar",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.COZINHEIRO, PERFIS.GERENTE),
   controller.cancel,
 );
 
 router.delete(
   "/:id",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.COZINHEIRO, PERFIS.GERENTE),
   controller.cancel,
 );
 

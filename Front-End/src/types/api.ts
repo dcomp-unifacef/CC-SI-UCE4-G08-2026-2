@@ -24,6 +24,7 @@ export interface Produto {
   nome: string;
   preco: string;
   descricao: string;
+  imagem: string;
   disponivel: boolean;
 }
 
@@ -34,7 +35,12 @@ export interface ItemPedido {
   quantidade: number;
   valorUnit: string;
   subTotal: string;
-  produto: { idProduto: number; nome: string; preco: string };
+  produto: {
+    idProduto: number;
+    nome: string;
+    preco: string;
+    imagem: string;
+  };
 }
 
 export interface Pedido {
@@ -45,10 +51,15 @@ export interface Pedido {
   numeroMesa: number;
   idCliente: number | null;
   idGarcom: number | null;
+  motivoCancelamento: string | null;
   cliente: { idUsuario: number; nome: string } | null;
   garcom: { idUsuario: number; nome: string } | null;
   itens: ItemPedido[];
   pagamento: unknown;
+}
+
+export interface CancelarPedidoInput {
+  motivo: string;
 }
 
 export interface ItemInput {
