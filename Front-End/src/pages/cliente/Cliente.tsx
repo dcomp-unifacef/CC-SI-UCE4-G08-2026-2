@@ -7,10 +7,12 @@ import {
   adicionarItem,
   alterarItem,
   removerItem,
+  listarPedidos,
 } from "../../api/pedidos";
 import { listarProdutos } from "../../api/produtos";
 import { ApiError } from "../../api/client";
 import { Layout } from "../../components/Layout";
+import { MotivoCancelamento } from "../../components/MotivoCancelamento";
 import { StatusBadge } from "../../components/StatusBadge";
 import { StatusProgressBar } from "../../components/StatusProgressBar";
 import { ProductCard } from "../../components/ProductCard";
@@ -24,6 +26,7 @@ export default function Cliente() {
   const { mesa, configurarMesa } = useMesaDoTablet();
 
   const [pedido, setPedido] = useState<Pedido | null>(null);
+  const [pedidoEncerrado, setPedidoEncerrado] = useState<Pedido | null>(null);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -40,7 +43,17 @@ export default function Cliente() {
     setCarregando(true);
     setErro(null);
     try {
-      setPedido(await buscarPedidoAtivoDaMesa(mesa));
+      const ativo = await buscarPedidoAtivoDaMesa(mesa);
+      setPedido(ativo);
+      if (!ativo) {
+        const encerrados = await listarPedidos({
+          numeroMesa: mesa,
+          status: ["Cancelado"],
+        });
+        setPedidoEncerrado(encerrados[0] ?? null);
+      } else {
+        setPedidoEncerrado(null);
+      }
     } catch (e) {
       setErro(e instanceof ApiError ? e.message : "Falha ao carregar.");
     } finally {
@@ -165,6 +178,18 @@ export default function Cliente() {
       {aviso && <div className="alert alert-info">{aviso}</div>}
       {erro && <div className="alert alert-danger">{erro}</div>}
 
+      {pedido === null && pedidoEncerrado && (
+        <div className="alert alert-danger">
+          <strong>O último pedido desta mesa foi cancelado.</strong>
+          {pedidoEncerrado.motivoCancelamento && (
+            <>
+              <br />
+              Motivo: {pedidoEncerrado.motivoCancelamento}
+            </>
+          )}
+        </div>
+      )}
+
       {pedido === null && (
         <>
           <h3>Cardápio</h3>
@@ -213,6 +238,7 @@ export default function Cliente() {
             <StatusBadge status={pedido.statusPedido} />
           </div>
           <StatusProgressBar status={pedido.statusPedido} />
+          <MotivoCancelamento pedido={pedido} />
           <p>
             <strong>Total:</strong> R$ {Number(pedido.valorTotal).toFixed(2)}
           </p>

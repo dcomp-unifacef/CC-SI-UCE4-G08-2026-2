@@ -11,7 +11,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <>
       <header className="cd-header py-3">
         <div className="container d-flex justify-content-between align-items-center">
-          <img src="/logo.svg" alt="Chic Dog" style={{ height: 32 }} />
+          <span className="cd-brand-badge">
+            <img src="/logo.svg" alt="Chic Dog" style={{ height: 32 }} />
+          </span>
           {usuario && <span className="fw-medium">{usuario.nome}</span>}
         </div>
       </header>
@@ -19,9 +21,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container d-flex gap-2 align-items-center flex-wrap">
           {staff && (
             <>
-              <Link className="btn btn-sm btn-outline-dark" to="/garcom">
+              <Link
+                className="btn btn-sm btn-outline-dark"
+                to={usuario?.tipo === "Administrador" ? "/admin" : "/garcom"}
+              >
                 Pedidos
               </Link>
+              {usuario?.tipo === "Administrador" && (
+                <Link
+                  className="btn btn-sm btn-outline-dark"
+                  to="/admin/historico"
+                >
+                  Histórico
+                </Link>
+              )}
               <Link className="btn btn-sm btn-outline-dark" to="/garcom/novo">
                 Novo pedido
               </Link>

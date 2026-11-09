@@ -9,6 +9,7 @@ import { Layout } from "../components/Layout";
 import { useToast } from "../components/Toast";
 import { StatusBadge } from "../components/StatusBadge";
 import { Modal } from "../components/Modal";
+import { MotivoCancelamento } from "../components/MotivoCancelamento";
 import { usePolling } from "../hooks/usePolling";
 import { useAuth } from "../contexts/AuthContext";
 import type { Pedido } from "../types/api";
@@ -40,7 +41,7 @@ export default function Cozinha() {
 
   async function carregar() {
     try {
-      setPedidos(await listarPedidos(dataFiltro || undefined));
+      setPedidos(await listarPedidos({ data: dataFiltro || undefined }));
       setAtualizadoEm(new Date());
     } catch {
       // silencioso; próxima tentativa
@@ -249,6 +250,7 @@ export default function Cozinha() {
               Total:
               R$ {Number(pedidoAberto.valorTotal).toFixed(2)}
             </p>
+            <MotivoCancelamento pedido={pedidoAberto} />
 
             {ehAdmin && (
               <div className="mt-3">

@@ -188,8 +188,10 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
       ? null
       : validarId(input.idCliente, "idCliente");
   const idGarcom =
-    input.idGarcom === undefined
-      ? usuarioAutenticado.id
+    input.idGarcom === undefined || input.idGarcom === null
+      ? ehCliente(usuarioAutenticado.tipo)
+        ? null
+        : usuarioAutenticado.id
       : validarId(input.idGarcom, "idGarcom");
   const idCozinheiro =
     input.idCozinheiro === undefined || input.idCozinheiro === null
@@ -206,7 +208,9 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   if (idCliente !== null) {
     await garantirUsuarioAtivo(idCliente, "Cliente");
   }
-  await garantirUsuarioAtivo(idGarcom, "Garçom");
+  if (idGarcom !== null) {
+    await garantirUsuarioAtivo(idGarcom, "Garçom");
+  }
   if (idCozinheiro !== null) {
     await garantirUsuarioAtivo(idCozinheiro, "Cozinheiro");
   }

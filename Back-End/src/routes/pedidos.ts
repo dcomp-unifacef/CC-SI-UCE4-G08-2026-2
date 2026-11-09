@@ -21,7 +21,7 @@ router.get("/:id", controller.retrieveOne);
 
 router.post(
   "/",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.GERENTE, PERFIS.CLIENTE),
   controller.create,
 );
 

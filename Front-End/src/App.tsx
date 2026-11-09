@@ -10,6 +10,8 @@ import GarcomLista from "./pages/garcom/GarcomLista";
 import GarcomNovo from "./pages/garcom/GarcomNovo";
 import GarcomPedido from "./pages/garcom/GarcomPedido";
 import Cozinha from "./pages/Cozinha";
+import AdminPedidos from "./pages/AdminPedidos";
+import AdminHistorico from "./pages/AdminHistorico";
 import Cliente from "./pages/cliente/Cliente";
 
 export default function App() {
@@ -48,6 +50,22 @@ export default function App() {
           element={
             <RotaProtegida>
               <Cozinha />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RotaProtegida>
+              <AdminPedidos />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/admin/historico"
+          element={
+            <RotaProtegida>
+              <AdminHistorico />
             </RotaProtegida>
           }
         />

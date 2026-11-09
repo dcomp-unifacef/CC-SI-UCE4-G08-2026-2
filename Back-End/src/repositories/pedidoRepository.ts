@@ -36,8 +36,8 @@ export interface ItemPedidoPersistido {
 }
 
 export interface DadosPedido {
-  idCliente?: number;
-  idGarcom?: number;
+  idCliente?: number | null;
+  idGarcom?: number | null;
   idCozinheiro?: number | null;
   tempoEstimado?: number | null;
   statusPedido?: string;
@@ -51,6 +51,7 @@ export interface FiltrosPedido {
   idCliente?: number;
   idGarcom?: number;
   idCozinheiro?: number;
+  numeroMesa?: number;
   data?: string; // YYYY-MM-DD
   page?: number;
   limit?: number;
@@ -70,6 +71,7 @@ function montarWhere(filtros: FiltrosPedido) {
   if (filtros.idCozinheiro !== undefined) {
     where.idCozinheiro = filtros.idCozinheiro;
   }
+  if (filtros.numeroMesa !== undefined) where.numeroMesa = filtros.numeroMesa;
 
   if (filtros.data) {
     const data = filtros.data;
@@ -159,10 +161,13 @@ function create(dados: DadosPedido, itens: ItemPedidoPersistido[]) {
     const pedido = await tx.pedido.create({
       data: {
         cliente:
-          dados.idCliente !== null
+          dados.idCliente !== undefined && dados.idCliente !== null
             ? { connect: { idUsuario: dados.idCliente } }
             : undefined,
-        garcom: { connect: { idUsuario: dados.idGarcom as number } },
+        garcom:
+          dados.idGarcom !== undefined && dados.idGarcom !== null
+            ? { connect: { idUsuario: dados.idGarcom } }
+            : undefined,
         statusPedido: dados.statusPedido ?? "Pendente",
         valorTotal: dados.valorTotal ?? 0,
         numeroMesa: dados.numeroMesa as number,

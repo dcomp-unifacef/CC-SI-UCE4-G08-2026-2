@@ -12,6 +12,7 @@ import { listarProdutos } from "../../api/produtos";
 import { ApiError } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
 import { StatusProgressBar } from "../../components/StatusProgressBar";
+import { MotivoCancelamento } from "../../components/MotivoCancelamento";
 import { Layout } from "../../components/Layout";
 import { ProductCard } from "../../components/ProductCard";
 import { acoesDeStatus, podeEditarItens } from "../../lib/status";
@@ -144,6 +145,7 @@ export default function GarcomPedido() {
         <StatusBadge status={pedido.statusPedido} />
       </div>
       <StatusProgressBar status={pedido.statusPedido} />
+      <MotivoCancelamento pedido={pedido} />
       <p>
         <strong>Total:</strong> R$ {Number(pedido.valorTotal).toFixed(2)}
       </p>

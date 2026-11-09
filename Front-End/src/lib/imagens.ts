@@ -1,7 +1,9 @@
-import imgCachorro from "../components/imgs/360_F_611014237_Cnc2qrcgkqwgRGZqfy5Wi9bQ1cmcFJ5z-removebg-preview.png";
-import imgBatata from "../components/imgs/images-removebg-preview.png";
-import imgHamburguer from "../components/imgs/istockphoto-486120619-612x612-removebg-preview.png";
-import imgBebida from "../components/imgs/istockphoto-840902892-612x612-removebg-preview.png";
+import imgHotDog from "../components/imgs/HotDog.png";
+import imgLanche from "../components/imgs/Lanche.png";
+import imgBatata from "../components/imgs/batatafrita.png";
+import imgRefri from "../components/imgs/RefriLata.png";
+import imgSuco from "../components/imgs/Suco.png";
+import imgPudim from "../components/imgs/Pudim.png";
 
 /**
  * Mapeia o nome do produto para a imagem personalizada (PNG com fundo transparente)
@@ -9,13 +11,13 @@ import imgBebida from "../components/imgs/istockphoto-840902892-612x612-removebg
  * imagem informada no banco (produto.imagem) ou uma string vazia.
  */
 const IMAGENS_LOCAIS: Record<string, string> = {
-  "cachorro-quente": imgCachorro,
-  "x-salada": imgHamburguer,
-  "x-bacon": imgHamburguer,
+  "cachorro-quente": imgHotDog,
+  "x-salada": imgLanche,
+  "x-bacon": imgLanche,
   "batata frita": imgBatata,
-  "refrigerante lata": imgBebida,
-  "suco natural": imgBebida,
-  pudim: imgBatata,
+  "refrigerante lata": imgRefri,
+  "suco natural": imgSuco,
+  pudim: imgPudim,
 };
 
 export function resolverImagem(
