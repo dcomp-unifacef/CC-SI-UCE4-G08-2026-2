@@ -1,4 +1,5 @@
 const CORES: Record<string, string> = {
+  Pendente: "secondary",
   Aberto: "secondary",
   "Em preparo": "warning",
   Pronto: "info",
@@ -8,6 +9,7 @@ const CORES: Record<string, string> = {
 };
 
 const ICONES: Record<string, string> = {
+  Pendente: "📝",
   Aberto: "📝",
   "Em preparo": "👨‍🍳",
   Pronto: "✅",

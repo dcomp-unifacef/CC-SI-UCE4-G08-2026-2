@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ItemCarrinho } from "../lib/carrinho";
 
 export function CartItem({
@@ -9,9 +10,25 @@ export function CartItem({
   onAlterar: (idProduto: number, quantidade: number) => void;
   onRemover: (idProduto: number) => void;
 }) {
+  const [imagemErro, setImagemErro] = useState(false);
+
   return (
-    <li className="list-group-item d-flex justify-content-between align-items-center">
-      <div>
+    <li className="list-group-item d-flex align-items-center gap-2">
+      <div className="cart-item__img">
+        {imagemErro ? (
+          <span className="product-card__emoji" aria-label="Imagem do produto">
+            🍔
+          </span>
+        ) : (
+          <img
+            src={item.imagem}
+            alt={item.nome}
+            loading="lazy"
+            onError={() => setImagemErro(true)}
+          />
+        )}
+      </div>
+      <div className="flex-grow-1">
         <div>{item.nome}</div>
         <small className="text-muted">
           R$ {item.preco.toFixed(2)} x {item.quantidade}

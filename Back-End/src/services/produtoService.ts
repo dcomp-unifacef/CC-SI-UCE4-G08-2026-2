@@ -41,6 +41,15 @@ function validarDisponivel(valor: unknown): boolean {
   return valor;
 }
 
+function validarImagem(valor: unknown): string {
+  if (valor === undefined || valor === null) return "";
+  if (typeof valor !== "string") {
+    throw new AppError("O campo imagem deve ser uma URL.", 400);
+  }
+
+  return valor.trim();
+}
+
 async function findAll() {
   const produtos = await repository.findAll();
   return produtos.map(serializeProduto);
@@ -62,11 +71,13 @@ async function create(data: CreateProdutoDto) {
   const descricao = validarTexto(data.descricao, "descricao", 100);
   const disponivel =
     data.disponivel === undefined ? true : validarDisponivel(data.disponivel);
+  const imagem = validarImagem(data.imagem);
 
   const produto = await repository.create({
     nome,
     preco,
     descricao,
+    imagem,
     disponivel,
   });
 
@@ -92,6 +103,10 @@ async function update(id: number, data: UpdateProdutoDto) {
 
   if (Object.prototype.hasOwnProperty.call(data, "disponivel")) {
     dadosAtualizados.disponivel = validarDisponivel(data.disponivel);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, "imagem")) {
+    dadosAtualizados.imagem = validarImagem(data.imagem);
   }
 
   if (Object.keys(dadosAtualizados).length === 0) {

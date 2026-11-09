@@ -2,12 +2,16 @@ import { apiFetch } from "./client";
 import { ApiError } from "./client";
 import type {
   AtualizarPedidoInput,
+  CancelarPedidoInput,
   CriarPedidoInput,
   Pedido,
 } from "../types/api";
 
-export async function listarPedidos(): Promise<Pedido[]> {
-  return apiFetch<Pedido[]>("/pedidos");
+export async function listarPedidos(
+  data?: string,
+): Promise<Pedido[]> {
+  const params = data ? `?data=${encodeURIComponent(data)}` : "";
+  return apiFetch<Pedido[]>(`/pedidos${params}`);
 }
 
 export async function buscarPedido(id: number): Promise<Pedido> {
@@ -44,6 +48,16 @@ export async function atualizarPedido(
   });
 }
 
+export async function atualizarStatusPedido(
+  id: number,
+  statusPedido: string,
+): Promise<Pedido> {
+  return apiFetch<Pedido>(`/pedidos/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: statusPedido }),
+  });
+}
+
 export async function adicionarItem(
   id: number,
   dados: { idProduto: number; quantidade: number },
@@ -68,5 +82,15 @@ export async function alterarItem(
 export async function removerItem(id: number, idItem: number): Promise<Pedido> {
   return apiFetch<Pedido>(`/pedidos/${id}/itens/${idItem}`, {
     method: "DELETE",
+  });
+}
+
+export async function cancelarPedido(
+  id: number,
+  dados: CancelarPedidoInput,
+): Promise<Pedido> {
+  return apiFetch<Pedido>(`/pedidos/${id}/cancelar`, {
+    method: "PATCH",
+    body: JSON.stringify(dados),
   });
 }

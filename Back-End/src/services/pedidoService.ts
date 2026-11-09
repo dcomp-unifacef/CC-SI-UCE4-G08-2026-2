@@ -183,7 +183,10 @@ async function findById(id: number, usuario?: UsuarioAutenticado) {
 
 async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   const input = getObjectData(data);
-  const idCliente = validarId(input.idCliente, "idCliente");
+  const idCliente =
+    input.idCliente === undefined || input.idCliente === null
+      ? null
+      : validarId(input.idCliente, "idCliente");
   const idGarcom =
     input.idGarcom === undefined
       ? usuarioAutenticado.id
@@ -200,7 +203,9 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   const numeroMesa = validarId(input.numeroMesa, "numeroMesa");
   const itensInput = validarItens(input.itens);
 
-  await garantirUsuarioAtivo(idCliente, "Cliente");
+  if (idCliente !== null) {
+    await garantirUsuarioAtivo(idCliente, "Cliente");
+  }
   await garantirUsuarioAtivo(idGarcom, "Garçom");
   if (idCozinheiro !== null) {
     await garantirUsuarioAtivo(idCozinheiro, "Cozinheiro");
@@ -299,7 +304,8 @@ async function alterarStatus(
 ) {
   const pedido = await buscarPedido(id);
   const input = getObjectData(data);
-  const novoStatus = input.status;
+  const novoStatus =
+    input.status ?? input.statusPedido;
 
   if (!statusPedidoValido(novoStatus)) {
     throw new AppError(
@@ -428,7 +434,19 @@ async function removerItem(id: number, idItemPedido: number) {
   return serializePedido(await repository.removeItem(idItemPedido, id));
 }
 
-async function cancelar(id: number, usuario: UsuarioAutenticado) {
+function validarMotivo(valor: unknown): string {
+  if (typeof valor !== "string" || valor.trim().length === 0) {
+    throw new AppError("O motivo do cancelamento é obrigatório.", 400);
+  }
+
+  return valor.trim();
+}
+
+async function cancelar(
+  id: number,
+  usuario: UsuarioAutenticado,
+  motivo: unknown,
+) {
   const pedido = await buscarPedido(id);
 
   if (!podeTransicionar(pedido.statusPedido, "Cancelado")) {
@@ -445,8 +463,13 @@ async function cancelar(id: number, usuario: UsuarioAutenticado) {
     );
   }
 
+  const motivoCancelamento = validarMotivo(motivo);
+
   return serializePedido(
-    await repository.updateStatus(id, { statusPedido: "Cancelado" }),
+    await repository.updateStatus(id, {
+      statusPedido: "Cancelado",
+      motivoCancelamento,
+    }),
   );
 }
 

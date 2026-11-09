@@ -82,8 +82,8 @@ export function perfilPodeAlterarStatus(
 
   if (novo === "Cancelado") {
     return (
-      perfilNormalizado === normalizarPerfil(PERFIS.GARCOM) &&
-      atual === "Pendente"
+      perfilNormalizado === normalizarPerfil(PERFIS.GARCOM) ||
+      perfilNormalizado === normalizarPerfil(PERFIS.COZINHEIRO)
     );
   }
 

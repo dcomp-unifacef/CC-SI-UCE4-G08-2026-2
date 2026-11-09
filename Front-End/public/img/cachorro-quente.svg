@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#fdf6e3"/>
+  <rect x="60" y="140" width="280" height="60" rx="30" fill="#d8913c"/>
+  <rect x="70" y="150" width="260" height="40" rx="20" fill="#c4451c"/>
+  <path d="M100 170 Q150 130 200 170 T300 170" fill="none" stroke="#b03a1e" stroke-width="6" stroke-linecap="round"/>
+  <rect x="90" y="120" width="220" height="14" rx="7" fill="#e8a33d"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Arial" font-size="16" fill="#6b4a22">Cachorro-quente</text>
+</svg>
