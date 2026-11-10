@@ -1,11 +1,13 @@
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
+import { NotificacaoSino } from "./NotificacaoSino";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { usuario, sair } = useAuth();
   const navigate = useNavigate();
 
   const staff = usuario?.tipo === "Garçom" || usuario?.tipo === "Administrador";
+  const ehGarcom = usuario?.tipo === "Garçom";
 
   return (
     <>
@@ -15,6 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <img src="/logo.svg" alt="Chic Dog" style={{ height: 32 }} />
           </span>
           {usuario && <span className="fw-medium">{usuario.nome}</span>}
+          {ehGarcom && <NotificacaoSino />}
         </div>
       </header>
       <nav className="cd-nav py-2">

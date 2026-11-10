@@ -218,30 +218,20 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   const itens = await montarItens(itensInput);
   const valorTotal = calcularTotal(itens);
 
-  try {
-    const pedido = await repository.create(
-      {
-        idCliente,
-        idGarcom,
-        idCozinheiro,
-        tempoEstimado,
-        statusPedido: "Pendente",
-        valorTotal,
-        numeroMesa,
-      },
-      itens,
-    );
+  const pedido = await repository.create(
+    {
+      idCliente,
+      idGarcom,
+      idCozinheiro,
+      tempoEstimado,
+      statusPedido: "Pendente",
+      valorTotal,
+      numeroMesa,
+    },
+    itens,
+  );
 
-    return serializePedido(pedido);
-  } catch (error: any) {
-    if (error?.code === "P2002") {
-      throw new AppError(
-        "Já existe um pedido ativo para esta mesa. Finalize ou cancele o pedido atual antes de criar um novo.",
-        409,
-      );
-    }
-    throw error;
-  }
+  return serializePedido(pedido);
 }
 
 async function update(id: number, data: unknown) {

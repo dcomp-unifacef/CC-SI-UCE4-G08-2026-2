@@ -13,6 +13,7 @@ import Cozinha from "./pages/Cozinha";
 import AdminPedidos from "./pages/AdminPedidos";
 import AdminHistorico from "./pages/AdminHistorico";
 import Cliente from "./pages/cliente/Cliente";
+import Pagamento from "./pages/pagamento/Pagamento";
 
 export default function App() {
   return (
@@ -74,6 +75,14 @@ export default function App() {
           element={
             <RotaProtegida>
               <Cliente />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/pagamento"
+          element={
+            <RotaProtegida>
+              <Pagamento />
             </RotaProtegida>
           }
         />

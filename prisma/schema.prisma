@@ -57,6 +57,18 @@ model Pagamento {
   @@map("pagamento")
 }
 
+model NotificacaoPagamento {
+  idNotificacao   Int      @id @default(autoincrement())
+  idPedido        Int
+  numeroMesa      Int
+  metodoPagamento String   @db.VarChar(50)
+  status          String   @db.VarChar(20) @default("PENDENTE")
+  dataHora        DateTime @default(now())
+  lida            Boolean  @default(false)
+
+  @@map("notificacaoPagamento")
+}
+
 model Produto {
   idProduto   Int          @id @default(autoincrement())
   nome        String       @db.VarChar(80)

@@ -5,6 +5,7 @@ import usuariosRouter from "./routes/usuarios";
 import produtosRouter from "./routes/produtos";
 import pedidosRouter from "./routes/pedidos";
 import pagamentosRouter from "./routes/pagamentos";
+import notificacoesRouter from "./routes/notificacoes";
 import { AppError } from "./errors/AppError";
 
 const app = express();
@@ -36,6 +37,7 @@ app.use("/usuarios", usuariosRouter);
 app.use("/produtos", produtosRouter);
 app.use("/pedidos", pedidosRouter);
 app.use("/pagamentos", pagamentosRouter);
+app.use("/notificacoes", notificacoesRouter);
 
 app.use((_req: Request, res: Response) => {
   return res.status(404).json({ erro: "Rota não encontrada." });
