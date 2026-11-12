@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 /generated/prisma
 instructions/
+
+/docs/relatorio/
+/docs/superpowers/

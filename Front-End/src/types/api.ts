@@ -62,6 +62,25 @@ export interface CancelarPedidoInput {
   motivo: string;
 }
 
+export interface NotificacaoPagamento {
+  idNotificacao: number;
+  idPedido: number;
+  numeroMesa: number;
+  metodoPagamento: string;
+  status: string;
+  dataHora: string;
+  lida: boolean;
+}
+
+export interface SolicitarPagamentoInput {
+  idPedido: number;
+  metodoPagamento: "PIX" | "CARTAO";
+}
+
+export interface ContarNaoLidasResponse {
+  naoLidas: number;
+}
+
 export interface ItemInput {
   idProduto: number;
   quantidade: number;

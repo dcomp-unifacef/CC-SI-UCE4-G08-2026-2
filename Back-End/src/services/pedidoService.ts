@@ -188,8 +188,10 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
       ? null
       : validarId(input.idCliente, "idCliente");
   const idGarcom =
-    input.idGarcom === undefined
-      ? usuarioAutenticado.id
+    input.idGarcom === undefined || input.idGarcom === null
+      ? ehCliente(usuarioAutenticado.tipo)
+        ? null
+        : usuarioAutenticado.id
       : validarId(input.idGarcom, "idGarcom");
   const idCozinheiro =
     input.idCozinheiro === undefined || input.idCozinheiro === null
@@ -206,7 +208,9 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   if (idCliente !== null) {
     await garantirUsuarioAtivo(idCliente, "Cliente");
   }
-  await garantirUsuarioAtivo(idGarcom, "Garçom");
+  if (idGarcom !== null) {
+    await garantirUsuarioAtivo(idGarcom, "Garçom");
+  }
   if (idCozinheiro !== null) {
     await garantirUsuarioAtivo(idCozinheiro, "Cozinheiro");
   }
@@ -214,30 +218,20 @@ async function create(data: unknown, usuarioAutenticado: UsuarioAutenticado) {
   const itens = await montarItens(itensInput);
   const valorTotal = calcularTotal(itens);
 
-  try {
-    const pedido = await repository.create(
-      {
-        idCliente,
-        idGarcom,
-        idCozinheiro,
-        tempoEstimado,
-        statusPedido: "Pendente",
-        valorTotal,
-        numeroMesa,
-      },
-      itens,
-    );
+  const pedido = await repository.create(
+    {
+      idCliente,
+      idGarcom,
+      idCozinheiro,
+      tempoEstimado,
+      statusPedido: "Pendente",
+      valorTotal,
+      numeroMesa,
+    },
+    itens,
+  );
 
-    return serializePedido(pedido);
-  } catch (error: any) {
-    if (error?.code === "P2002") {
-      throw new AppError(
-        "Já existe um pedido ativo para esta mesa. Finalize ou cancele o pedido atual antes de criar um novo.",
-        409,
-      );
-    }
-    throw error;
-  }
+  return serializePedido(pedido);
 }
 
 async function update(id: number, data: unknown) {

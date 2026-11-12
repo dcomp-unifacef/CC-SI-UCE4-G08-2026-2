@@ -83,6 +83,15 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.5px;
 }
 
+/* Destaque da logo sobre o fundo vermelho do header */
+.cd-brand-badge {
+  background: rgba(255, 255, 255, 0.92);
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
 /* Navbar */
 .cd-nav {
   background: #fff;

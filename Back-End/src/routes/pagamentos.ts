@@ -10,13 +10,13 @@ router.use(autenticar);
 router.get("/", autorizar(PERFIS.GERENTE), controller.retrieveAll);
 router.get(
   "/pedido/:idPedido",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.GERENTE, PERFIS.CLIENTE),
   controller.retrieveByPedido,
 );
 router.get("/:id", autorizar(PERFIS.GERENTE), controller.retrieveOne);
 router.post(
   "/",
-  autorizar(PERFIS.GARCOM, PERFIS.GERENTE),
+  autorizar(PERFIS.GARCOM, PERFIS.GERENTE, PERFIS.CLIENTE),
   controller.create,
 );
 router.put("/:id", autorizar(PERFIS.GERENTE), controller.update);

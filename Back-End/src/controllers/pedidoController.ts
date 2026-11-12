@@ -88,6 +88,10 @@ export async function retrieveAll(
             req.query.idCozinheiro,
             "idCozinheiro",
           ),
+          numeroMesa: parseOptionalInt(
+            req.query.numeroMesa,
+            "numeroMesa",
+          ),
           data: parseData(req.query.data),
           page: parseOptionalInt(req.query.page, "page"),
           limit: parseOptionalInt(req.query.limit, "limit"),

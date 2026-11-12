@@ -7,11 +7,44 @@ import type {
   Pedido,
 } from "../types/api";
 
+export interface FiltrosListarPedidos {
+  data?: string; // YYYY-MM-DD
+  status?: string | string[];
+  numeroMesa?: number;
+  page?: number;
+  limit?: number;
+}
+
 export async function listarPedidos(
-  data?: string,
+  filtros?: FiltrosListarPedidos,
 ): Promise<Pedido[]> {
-  const params = data ? `?data=${encodeURIComponent(data)}` : "";
-  return apiFetch<Pedido[]>(`/pedidos${params}`);
+  const params = new URLSearchParams();
+
+  if (filtros?.numeroMesa) {
+    params.set("numeroMesa", String(filtros.numeroMesa));
+  }
+
+  if (filtros?.data) {
+    params.set("data", filtros.data);
+  }
+
+  if (filtros?.status !== undefined) {
+    const statuses = Array.isArray(filtros.status)
+      ? filtros.status
+      : [filtros.status];
+    statuses.forEach((status) => params.append("status", status));
+  }
+
+  if (filtros?.page) {
+    params.set("page", String(filtros.page));
+  }
+
+  if (filtros?.limit) {
+    params.set("limit", String(filtros.limit));
+  }
+
+  const query = params.toString();
+  return apiFetch<Pedido[]>(`/pedidos${query ? `?${query}` : ""}`);
 }
 
 export async function buscarPedido(id: number): Promise<Pedido> {
