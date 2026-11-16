@@ -1,8 +1,12 @@
 ﻿import service from "../services/tipoUsuarioService";
+// Service coordena validações de perfil e repository Prisma.
+// Erro HTTP para parâmetros inválidos.
 import { AppError } from "../errors/AppError";
+// Tipos dos corpos aceitos nas operações de criação e atualização.
 import { CreateTipoUsuarioDto } from "../dto/tipoUsuario/createTipoUsuarioDto";
 import { UpdateTipoUsuarioDto } from "../dto/tipoUsuario/updateTipoUsuarioDto";
 
+// Valida ID recebido na URL e fornece chave numérica ao service.
 function parseId(raw: string): number {
   const id = Number(raw);
   if (!Number.isInteger(id) || id <= 0) {
@@ -11,6 +15,7 @@ function parseId(raw: string): number {
   return id;
 }
 
+// Lista os tipos de usuário existentes.
 export async function retrieveAll(req: any, res: any, next: any) {
   try {
     return res.json(await service.findAll());
@@ -19,6 +24,7 @@ export async function retrieveAll(req: any, res: any, next: any) {
   }
 }
 
+// Recupera perfil por identificador e propaga ausência como erro controlado.
 export async function retrieveOne(req: any, res: any, next: any) {
   try {
     return res.json(await service.findById(parseId(req.params.id)));
@@ -27,6 +33,7 @@ export async function retrieveOne(req: any, res: any, next: any) {
   }
 }
 
+// Cria um perfil a partir do DTO e indica sucesso com status 201.
 export async function create(req: any, res: any, next: any) {
   try {
     const data = req.body as CreateTipoUsuarioDto;
@@ -36,6 +43,7 @@ export async function create(req: any, res: any, next: any) {
   }
 }
 
+// Atualiza nome de perfil depois de validar o ID.
 export async function update(req: any, res: any, next: any) {
   try {
     const data = req.body as UpdateTipoUsuarioDto;
@@ -45,6 +53,7 @@ export async function update(req: any, res: any, next: any) {
   }
 }
 
+// Remove perfil, com conflitos de chave estrangeira tratados pelo service.
 export async function remove(req: any, res: any, next: any) {
   try {
     await service.remove(parseId(req.params.id));

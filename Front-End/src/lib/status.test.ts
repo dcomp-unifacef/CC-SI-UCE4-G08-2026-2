@@ -1,4 +1,7 @@
+// Testes das regras de transição e edição de status utilizadas nas telas operacionais.
+// Importa as ferramentas de teste; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { expect, test } from "vitest";
+// Importa o módulo ./status, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { acoesDeStatus, pedidoAtivo, podeEditarItens } from "./status";
 
 test("pedidoAtivo ignora Pago e Cancelado", () => {

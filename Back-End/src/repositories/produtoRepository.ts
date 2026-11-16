@@ -1,9 +1,13 @@
+// Prisma fornece a persistência do catálogo consumida pelo produtoService.
 import { prisma } from "../database/client";
+// Tipos de entrada de produto orientam a escrita; os DTOs de usuário abaixo permanecem importados sem uso neste módulo.
 import { CreateProdutoDto } from "../dto/produto/createProdutoDto";
 import { UpdateProdutoDto } from "../dto/produto/updateProdutoDto";
+// DTOs de usuário importados neste arquivo e mantidos como no código existente.
 import { CreateUsuarioDto } from "../dto/usuario/createUsuarioDto";
 import { UpdateUsuarioDto } from "../dto/usuario/updateUsuarioDto";
 
+// Lista o catálogo em ordem alfabética para apresentação.
 function findAll() {
   return prisma.produto.findMany({
     orderBy: {
@@ -12,6 +16,7 @@ function findAll() {
   });
 }
 
+// Consulta um produto pela chave primária.
 function findById(idProduto: number) {
   return prisma.produto.findUnique({
     where: {
@@ -20,6 +25,7 @@ function findById(idProduto: number) {
   });
 }
 
+// Cria produto e normaliza imagem ausente para string vazia antes da persistência.
 function create(data: CreateProdutoDto) {
   return prisma.produto.create({
     data: {
@@ -29,6 +35,7 @@ function create(data: CreateProdutoDto) {
   });
 }
 
+// Atualiza os campos já filtrados/validados pelo produtoService.
 function update(idProduto: number, data: UpdateProdutoDto) {
   return prisma.produto.update({
     where: {
@@ -38,6 +45,7 @@ function update(idProduto: number, data: UpdateProdutoDto) {
   });
 }
 
+// Remove produto pela chave; conflitos de relacionamento são tratados acima, se aplicável.
 function remove(idProduto: number) {
   return prisma.produto.delete({
     where: {
@@ -46,6 +54,7 @@ function remove(idProduto: number) {
   });
 }
 
+// Exporta operações usadas pelo service e mantém Prisma encapsulado.
 export default {
   findAll,
   findById,

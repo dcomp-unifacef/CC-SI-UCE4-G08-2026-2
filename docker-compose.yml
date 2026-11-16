@@ -1,31 +1,43 @@
+# Declara os serviços locais necessários para executar a API e o PostgreSQL.
 services:
   postgres:
+    # Usa a imagem oficial PostgreSQL 16 para persistir os dados da aplicação.
     image: postgres:16
+    # Nome fixo para facilitar a identificação do contêiner no ambiente local.
     container_name: chicdog_postgres
+    # Publica a porta configurável do host para a porta padrão do PostgreSQL no contêiner.
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
+    # Inicializa o banco e as credenciais de desenvolvimento na primeira execução.
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=prompt_solutions
       - POSTGRES_DB=chicdog
+    # Mantém os dados do PostgreSQL em volume mesmo após recriar o contêiner.
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    # Só marca o serviço pronto quando o banco consegue aceitar conexões.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d chicdog"]
       interval: 5s
       timeout: 5s
       retries: 10
+    # Conecta o banco à rede compartilhada com a API.
     networks:
       - chicdog-network
 
   app:
+    # Constrói a imagem da API usando o Dockerfile da raiz.
     build: .
     container_name: chicdog_backend
+    # Expõe a API na porta local 3333.
     ports:
       - "3333:3333"
+    # Monta o código para desenvolvimento e preserva node_modules do contêiner.
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    # Fornece ao processo as configurações de banco, autenticação e seed.
     environment:
       - DATABASE_URL=postgresql://postgres:prompt_solutions@postgres:5432/chicdog
       - PORT=3333
@@ -41,15 +53,19 @@ services:
       - SEED_GARCOM_SENHA=${SEED_GARCOM_SENHA:-garcom123}
       - SEED_COZINHEIRO_LOGIN=${SEED_COZINHEIRO_LOGIN:-cozinheiro}
       - SEED_COZINHEIRO_SENHA=${SEED_COZINHEIRO_SENHA:-cozinheiro123}
+    # Aguarda o healthcheck do PostgreSQL antes de iniciar as migrações e a API.
     depends_on:
       postgres:
         condition: service_healthy
+    # Permite a resolução do serviço postgres pelo nome dentro da rede Docker.
     networks:
       - chicdog-network
 
+# Rede privada para comunicação entre os contêineres do projeto.
 networks:
   chicdog-network:
     driver: bridge
 
+# Volume nomeado para preservar o conteúdo do banco entre reinicializações.
 volumes:
   postgres_data:

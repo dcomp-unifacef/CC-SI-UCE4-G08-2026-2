@@ -1,19 +1,27 @@
+// Gera o Prisma Client usado pela API, pelos serviços e pelo script de seed.
 generator client {
   provider = "prisma-client-js"
 }
 
+// Configura o banco PostgreSQL; a URL de conexão é fornecida pelo Prisma Config.
 datasource db {
   provider = "postgresql"
 }
 
+// Perfis de acesso disponíveis e a relação inversa com os usuários associados.
 model TipoUsuario {
+  // Identificador numérico gerado automaticamente para o perfil.
   idTipoUsuario Int       @id @default(autoincrement())
+  // Nome exibido para o perfil (por exemplo, Administrador ou Cliente).
   nome          String    @db.VarChar(50)
+  // Usuários que possuem este perfil; o nome identifica a relação no Prisma.
   usuarios      Usuario[] @relation("TipoUsuarioToUsuario")
 
+  // Mantém o nome da tabela compatível com o banco existente.
   @@map("tipoUsuario")
 }
 
+// Dados de autenticação e relações dos usuários com pedidos e perfis.
 model Usuario {
   idUsuario      Int         @id @default(autoincrement())
   nome           String      @db.VarChar(80)
@@ -25,9 +33,11 @@ model Usuario {
   pedidosGarcom  Pedido[]    @relation("GarcomToPedido")
   tipoUsuario    TipoUsuario @relation("TipoUsuarioToUsuario", fields: [idTipoUsuario], references: [idTipoUsuario], onUpdate: NoAction)
 
+  // Mapeia o modelo para a tabela física já existente no PostgreSQL.
   @@map("usuario")
 }
 
+// Pedido de uma mesa, com itens, pagamento opcional e participantes opcionais.
 model Pedido {
   idPedido     Int          @id @default(autoincrement())
   valorTotal   Decimal      @db.Decimal(10, 2)
@@ -42,9 +52,11 @@ model Pedido {
   cliente      Usuario?     @relation("ClienteToPedido", fields: [idCliente], references: [idUsuario], onUpdate: NoAction)
   garcom       Usuario?     @relation("GarcomToPedido", fields: [idGarcom], references: [idUsuario], onUpdate: NoAction)
 
+  // Preserva o nome físico da tabela usado pelas migrações e repositórios.
   @@map("pedido")
 }
 
+// Pagamento associado a um pedido; o índice único implementa a relação 1:1.
 model Pagamento {
   idPagamento    Int      @id @default(autoincrement())
   valor          Decimal  @db.Decimal(10, 2)
@@ -54,9 +66,11 @@ model Pagamento {
   idPedido       Int      @unique(map: "unq_pagamento_pedido")
   pedido         Pedido   @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
 
+  // Nome físico da tabela no banco PostgreSQL.
   @@map("pagamento")
 }
 
+// Solicitações de pagamento feitas pelo cliente e exibidas à equipe.
 model NotificacaoPagamento {
   idNotificacao   Int      @id @default(autoincrement())
   idPedido        Int
@@ -66,9 +80,11 @@ model NotificacaoPagamento {
   dataHora        DateTime @default(now())
   lida            Boolean  @default(false)
 
+  // Nome físico da tabela no banco PostgreSQL.
   @@map("notificacaoPagamento")
 }
 
+// Catálogo de itens oferecidos, incluindo preço, imagem e disponibilidade.
 model Produto {
   idProduto   Int          @id @default(autoincrement())
   nome        String       @db.VarChar(80)
@@ -78,9 +94,11 @@ model Produto {
   disponivel  Boolean      @default(true)
   itensPedido ItemPedido[]
 
+  // Nome físico da tabela no banco PostgreSQL.
   @@map("produto")
 }
 
+// Produto incluído em um pedido, com quantidade e valores registrados.
 model ItemPedido {
   idItemPedido Int     @id @default(autoincrement())
   subTotal     Decimal @db.Decimal(10, 2)
@@ -91,5 +109,6 @@ model ItemPedido {
   pedido       Pedido  @relation(fields: [idPedido], references: [idPedido], onUpdate: NoAction)
   produto      Produto @relation(fields: [idProduto], references: [idProduto], onUpdate: NoAction)
 
+  // Nome físico da tabela no banco PostgreSQL.
   @@map("itemPedido")
 }

@@ -1,6 +1,11 @@
+// área do cliente: apresenta catálogo e carrinho, permitindo criar e acompanhar pedidos associados à mesa.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useEffect, useState } from "react";
+// Importa o contexto compartilhado, que fornece estado e ações à tela; esses valores conectam a página ao AuthContext.
 import { useAuth } from "../../contexts/AuthContext";
+// Importa um hook compartilhado de estado ou comportamento; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useMesaDoTablet } from "../../hooks/useMesaDoTablet";
+// Importa o módulo ../../api/pedidos, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import {
   buscarPedidoAtivoDaMesa,
   criarPedido,
@@ -9,52 +14,85 @@ import {
   removerItem,
   listarPedidos,
 } from "../../api/pedidos";
+// Importa o módulo ../../api/produtos, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { listarProdutos } from "../../api/produtos";
+// Importa o módulo ../../api/client, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { ApiError } from "../../api/client";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { Layout } from "../../components/Layout";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { MotivoCancelamento } from "../../components/MotivoCancelamento";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { StatusBadge } from "../../components/StatusBadge";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { StatusProgressBar } from "../../components/StatusProgressBar";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { ProductCard } from "../../components/ProductCard";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { CartItem } from "../../components/CartItem";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { MenuPagamento } from "../../components/MenuPagamento";
+// Importa uma regra ou utilitário local reutilizável; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { podeEditarItens } from "../../lib/status";
+// Importa uma regra ou utilitário local reutilizável; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import {
   adicionarItem as adicionarCarrinho,
   alterarQuantidade,
   calcularPrevia,
+  // Declara alias de tipo ItemCarrinho, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   type ItemCarrinho,
 } from "../../lib/carrinho";
+// Importa os contratos de dados usados entre interface e API; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { Pedido, Produto } from "../../types/api";
 
+// Declara função Cliente, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export default function Cliente() {
+  // Obtém as ações e os dados de usuário fornecidos pelo contexto global de autenticação.
   const { usuario } = useAuth();
+  // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
   const { mesa, configurarMesa } = useMesaDoTablet();
 
+  // Inicializa o estado local pedidoAtivo, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pedidoAtivo, setPedidoAtivo] = useState<Pedido | null>(null);
+  // Inicializa o estado local pedidosDaMesa, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pedidosDaMesa, setPedidosDaMesa] = useState<Pedido[]>([]);
+  // Inicializa o estado local produtos, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  // Inicializa o estado local carregando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [carregando, setCarregando] = useState(true);
+  // Inicializa o estado local erro, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [erro, setErro] = useState<string | null>(null);
+  // Inicializa o estado local carrinho, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
+  // Inicializa o estado local enviando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [enviando, setEnviando] = useState(false);
+  // Inicializa o estado local avisoNovoPedido, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [avisoNovoPedido, setAvisoNovoPedido] = useState<string | null>(null);
+  // Inicializa o estado local abertoNovoPedido, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [abertoNovoPedido, setAbertoNovoPedido] = useState(false);
+  // Inicializa o estado local mesaNova, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [mesaNova, setMesaNova] = useState(0);
+  // Inicializa o estado local pagamentoConcluido, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pagamentoConcluido, setPagamentoConcluido] = useState(false);
 
+  // Sincroniza efeitos externos (API, temporizadores ou navegação) com o ciclo de vida do componente.
   useEffect(() => {
     listarProdutos().then(setProdutos).catch(() => {});
   }, []);
 
+  // Declara função carregar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function carregar() {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (mesa === null) return;
     setCarregando(true);
     setErro(null);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Declara valor ativo, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
       const ativo = await buscarPedidoAtivoDaMesa(mesa);
       setPedidoAtivo(ativo ?? null);
 
+      // Declara valor todos, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
       const todos = await listarPedidos({ numeroMesa: mesa });
       setPedidosDaMesa(todos);
     } catch (e) {
@@ -64,15 +102,19 @@ export default function Cliente() {
     }
   }
 
+  // Sincroniza efeitos externos (API, temporizadores ou navegação) com o ciclo de vida do componente.
   useEffect(() => {
     carregar();
   }, [mesa]);
 
+  // Declara valor ehDono, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const ehDono = pedidoAtivo?.idCliente === usuario?.id;
+  // Declara valor podeEditar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const podeEditar =
     pedidoAtivo !== null &&
     ehDono &&
     podeEditarItens(pedidoAtivo.statusPedido);
+  // Declara valor podePagar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const podePagar =
     pedidoAtivo !== null && ehDono && pedidoAtivo.statusPedido !== "Cancelado";
 
@@ -91,17 +133,22 @@ export default function Cliente() {
     })),
   );
 
+  // Declara valor totalMesa, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const totalMesa = itensPorPedido.reduce(
     (acc, it) => acc + it.subTotal,
     0,
   );
 
+  // Declara função enviarNovo, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function enviarNovo() {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (mesa === null) return;
     setEnviando(true);
     setErro(null);
     setAvisoNovoPedido(null);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Declara valor criado, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
       const criado = await criarPedido({
         numeroMesa: mesa,
         idCliente: usuario?.id ?? undefined,
@@ -115,6 +162,7 @@ export default function Cliente() {
       setAbertoNovoPedido(false);
       await carregar();
     } catch (e) {
+      // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
       if (e instanceof ApiError && e.status === 409 && e.detalhes?.idPedido) {
         setAvisoNovoPedido(
           "Esta mesa já tem um pedido em andamento. Você pode acrescentar itens a ele ou fazer outro pedido.",
@@ -128,12 +176,17 @@ export default function Cliente() {
     }
   }
 
+  // Declara função acrescentar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function acrescentar() {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!pedidoAtivo || mesa === null) return;
     setEnviando(true);
     setErro(null);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Declara estado mutável atualizado, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
       let atualizado = pedidoAtivo;
+      // Repete o processamento para os dados do fluxo atual.
       for (const item of carrinho) {
         atualizado = await adicionarItem(atualizado.idPedido, {
           idProduto: item.idProduto,
@@ -144,6 +197,7 @@ export default function Cliente() {
       setCarrinho([]);
       await carregar();
     } catch (e) {
+      // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
       if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
         setErro(e.message);
         await carregar();
@@ -155,11 +209,15 @@ export default function Cliente() {
     }
   }
 
+  // Declara função alterarQuantidadeItem, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function alterarQuantidadeItem(idItem: number, quantidade: number) {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!pedidoAtivo) return;
     setEnviando(true);
     setErro(null);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
       if (quantidade <= 0) {
         setPedidoAtivo(await removerItem(pedidoAtivo.idPedido, idItem));
       } else {
@@ -169,6 +227,7 @@ export default function Cliente() {
       }
       await carregar();
     } catch (e) {
+      // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
       if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
         setErro(e.message);
         await carregar();
@@ -180,10 +239,13 @@ export default function Cliente() {
     }
   }
 
+  // Declara função adicionarProduto, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function adicionarProduto(produto: Produto) {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!pedidoAtivo) return;
     setEnviando(true);
     setErro(null);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       setPedidoAtivo(
         await adicionarItem(pedidoAtivo.idPedido, {
@@ -193,6 +255,7 @@ export default function Cliente() {
       );
       await carregar();
     } catch (e) {
+      // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
       if (e instanceof ApiError && (e.status === 409 || e.status === 403)) {
         setErro(e.message);
         await carregar();
@@ -204,7 +267,9 @@ export default function Cliente() {
     }
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (mesa === null) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <Layout>
         <h1>Configurar tablet</h1>
@@ -212,6 +277,7 @@ export default function Cliente() {
         {erro && <div className="alert alert-danger">{erro}</div>}
         <div className="input-group" style={{ maxWidth: 320 }}>
           <input
+            // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
             type="number"
             className="form-control"
             placeholder="Número da mesa"
@@ -224,9 +290,12 @@ export default function Cliente() {
           <button
             className="btn btn-primary"
             onClick={() => {
+              // Declara valor m, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
               const m = mesaNova;
+              // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
               if (!Number.isInteger(m) || m <= 0) {
                 setErro("Informe um número de mesa válido.");
+                // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
                 return;
               }
               setErro(null);
@@ -240,7 +309,9 @@ export default function Cliente() {
     );
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (carregando) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <Layout>
         <p>Carregando...</p>
@@ -248,6 +319,7 @@ export default function Cliente() {
     );
   }
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <Layout>
       <h1>Mesa {mesa}</h1>

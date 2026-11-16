@@ -1,4 +1,7 @@
+// Testes das regras de leitura e validação da mesa configurada para o tablet.
+// Importa as ferramentas de teste; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { expect, test } from "vitest";
+// Importa o módulo ./mesa, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { mesaDaUrl, resolverMesa, validarMesa } from "./mesa";
 
 test("validarMesa aceita apenas inteiro positivo", () => {

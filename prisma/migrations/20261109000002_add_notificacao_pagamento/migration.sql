@@ -1,3 +1,4 @@
+-- Cria a fila de solicitações de pagamento enviada pelos clientes à equipe.
 -- CreateTable
 CREATE TABLE "notificacaoPagamento" (
     "idNotificacao" SERIAL NOT NULL,
@@ -11,5 +12,6 @@ CREATE TABLE "notificacaoPagamento" (
     CONSTRAINT "notificacaoPagamento_pkey" PRIMARY KEY ("idNotificacao")
 );
 
+-- Garante que a notificação se refira a um pedido existente.
 -- AddForeignKey
 ALTER TABLE "notificacaoPagamento" ADD CONSTRAINT "notificacaoPagamento_idPedido_fkey" FOREIGN KEY ("idPedido") REFERENCES "pedido"("idPedido") ON DELETE RESTRICT ON UPDATE NO ACTION;

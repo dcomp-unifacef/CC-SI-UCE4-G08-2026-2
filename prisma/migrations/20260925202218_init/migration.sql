@@ -1,3 +1,4 @@
+-- Cria os perfis de usuário usados para diferenciar permissões no sistema.
 -- CreateTable
 CREATE TABLE "tipoUsuario" (
     "idTipoUsuario" SERIAL NOT NULL,
@@ -6,6 +7,7 @@ CREATE TABLE "tipoUsuario" (
     CONSTRAINT "tipoUsuario_pkey" PRIMARY KEY ("idTipoUsuario")
 );
 
+-- Cria os registros de usuários e associa cada um a um perfil.
 -- CreateTable
 CREATE TABLE "usuario" (
     "idUsuario" SERIAL NOT NULL,
@@ -18,6 +20,7 @@ CREATE TABLE "usuario" (
     CONSTRAINT "usuario_pkey" PRIMARY KEY ("idUsuario")
 );
 
+-- Cria pedidos com seus valores, estados e referências aos usuários responsáveis.
 -- CreateTable
 CREATE TABLE "pedido" (
     "idPedido" SERIAL NOT NULL,
@@ -30,6 +33,7 @@ CREATE TABLE "pedido" (
     CONSTRAINT "pedido_pkey" PRIMARY KEY ("idPedido")
 );
 
+-- Cria pagamentos vinculados a pedidos.
 -- CreateTable
 CREATE TABLE "pagamento" (
     "idPagamento" SERIAL NOT NULL,
@@ -41,6 +45,7 @@ CREATE TABLE "pagamento" (
     CONSTRAINT "pagamento_pkey" PRIMARY KEY ("idPagamento")
 );
 
+-- Cria o catálogo de produtos que podem ser adicionados aos pedidos.
 -- CreateTable
 CREATE TABLE "produto" (
     "idProduto" SERIAL NOT NULL,
@@ -52,6 +57,7 @@ CREATE TABLE "produto" (
     CONSTRAINT "produto_pkey" PRIMARY KEY ("idProduto")
 );
 
+-- Cria as linhas que ligam produtos aos pedidos e guardam quantidade e valores.
 -- CreateTable
 CREATE TABLE "itemPedido" (
     "idItemPedido" SERIAL NOT NULL,
@@ -64,26 +70,34 @@ CREATE TABLE "itemPedido" (
     CONSTRAINT "itemPedido_pkey" PRIMARY KEY ("idItemPedido")
 );
 
+-- Garante que cada usuário tenha um login único.
 -- CreateIndex
 CREATE UNIQUE INDEX "unq_login" ON "usuario"("loginUsuario");
 
+-- Garante que um pedido não tenha mais de um pagamento associado.
 -- CreateIndex
 CREATE UNIQUE INDEX "unq_pagamento_pedido" ON "pagamento"("idPedido");
 
+-- Exige que cada usuário esteja associado a um perfil cadastrado.
 -- AddForeignKey
 ALTER TABLE "usuario" ADD CONSTRAINT "usuario_idTipoUsuario_fkey" FOREIGN KEY ("idTipoUsuario") REFERENCES "tipoUsuario"("idTipoUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
+-- Relaciona o cliente do pedido com um registro de usuário.
 -- AddForeignKey
 ALTER TABLE "pedido" ADD CONSTRAINT "pedido_idCliente_fkey" FOREIGN KEY ("idCliente") REFERENCES "usuario"("idUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
+-- Relaciona o garçom responsável pelo pedido com um registro de usuário.
 -- AddForeignKey
 ALTER TABLE "pedido" ADD CONSTRAINT "pedido_idGarcom_fkey" FOREIGN KEY ("idGarcom") REFERENCES "usuario"("idUsuario") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
+-- Liga cada pagamento ao pedido correspondente.
 -- AddForeignKey
 ALTER TABLE "pagamento" ADD CONSTRAINT "pagamento_idPedido_fkey" FOREIGN KEY ("idPedido") REFERENCES "pedido"("idPedido") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
+-- Garante que cada item pertença a um pedido válido.
 -- AddForeignKey
 ALTER TABLE "itemPedido" ADD CONSTRAINT "itemPedido_idPedido_fkey" FOREIGN KEY ("idPedido") REFERENCES "pedido"("idPedido") ON DELETE RESTRICT ON UPDATE NO ACTION;
 
+-- Garante que cada item referencia um produto existente.
 -- AddForeignKey
 ALTER TABLE "itemPedido" ADD CONSTRAINT "itemPedido_idProduto_fkey" FOREIGN KEY ("idProduto") REFERENCES "produto"("idProduto") ON DELETE RESTRICT ON UPDATE NO ACTION;

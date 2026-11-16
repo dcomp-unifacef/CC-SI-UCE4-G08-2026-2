@@ -1,19 +1,32 @@
+// Tela administrativa de histórico, consultando pedidos e apresentando filtros e detalhes do período.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useEffect, useState } from "react";
+// Importa o adaptador de API responsável pela comunicação com o servidor; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import {
   listarPedidos,
   atualizarStatusPedido,
   cancelarPedido,
 } from "../api/pedidos";
+// Importa o adaptador de API responsável pela comunicação com o servidor; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { ApiError } from "../api/client";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { Layout } from "../components/Layout";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useToast } from "../components/Toast";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { StatusBadge } from "../components/StatusBadge";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { Modal } from "../components/Modal";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { MotivoCancelamento } from "../components/MotivoCancelamento";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { EmptyState } from "../components/EmptyState";
+// Importa o contexto compartilhado, que fornece estado e ações à tela; esses valores conectam a página ao AuthContext.
 import { useAuth } from "../contexts/AuthContext";
+// Importa os contratos de dados usados entre interface e API; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { Pedido } from "../types/api";
 
+// Declara valor STATUS_VISIVEIS_ADMIN, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 const STATUS_VISIVEIS_ADMIN = [
   "Pendente",
   "Aberto",
@@ -23,27 +36,44 @@ const STATUS_VISIVEIS_ADMIN = [
   "Cancelado",
 ] as const;
 
+// Declara valor LIMITE, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 const LIMITE = 50;
 
+// Declara função AdminHistorico, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export default function AdminHistorico() {
+  // Obtém as ações e os dados de usuário fornecidos pelo contexto global de autenticação.
   const { usuario } = useAuth();
+  // Declara valor ehAdmin, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const ehAdmin = usuario?.tipo === "Administrador";
+  // Declara valor toast, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const toast = useToast();
 
+  // Inicializa o estado local pedidos, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  // Inicializa o estado local pagina, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pagina, setPagina] = useState(1);
+  // Inicializa o estado local filtroData, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [filtroData, setFiltroData] = useState("");
+  // Inicializa o estado local filtroStatus, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [filtroStatus, setFiltroStatus] = useState("");
+  // Inicializa o estado local temProxima, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [temProxima, setTemProxima] = useState(true);
+  // Inicializa o estado local carregando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [carregando, setCarregando] = useState(false);
 
+  // Inicializa o estado local pedidoAberto, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pedidoAberto, setPedidoAberto] = useState<Pedido | null>(null);
+  // Inicializa o estado local novoStatusAdmin, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [novoStatusAdmin, setNovoStatusAdmin] = useState<string>("");
+  // Inicializa o estado local ocupado, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [ocupado, setOcupado] = useState<number | null>(null);
 
+  // Declara função carregar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function carregar() {
     setCarregando(true);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Declara valor lista, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
       const lista = await listarPedidos({
         status: filtroStatus || undefined,
         data: filtroData || undefined,
@@ -59,12 +89,15 @@ export default function AdminHistorico() {
     }
   }
 
+  // Sincroniza efeitos externos (API, temporizadores ou navegação) com o ciclo de vida do componente.
   useEffect(() => {
     carregar();
   }, [pagina, filtroData, filtroStatus]);
 
+  // Declara função mover, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function mover(pedido: Pedido, novoStatus: string) {
     setOcupado(pedido.idPedido);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       await atualizarStatusPedido(pedido.idPedido, novoStatus);
       await carregar();
@@ -77,10 +110,14 @@ export default function AdminHistorico() {
     }
   }
 
+  // Declara função cancelar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function cancelar(pedido: Pedido) {
+    // Declara valor motivo, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
     const motivo = window.prompt("Informe o motivo do cancelamento:");
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!motivo || motivo.trim().length === 0) return;
     setOcupado(pedido.idPedido);
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       await cancelarPedido(pedido.idPedido, { motivo: motivo.trim() });
       await carregar();
@@ -93,7 +130,9 @@ export default function AdminHistorico() {
     }
   }
 
+  // Declara função statusDestinoValido, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   function statusDestinoValido(atual: string): string[] {
+    // Declara valor map, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
     const map: Record<string, string[]> = {
       Pendente: ["Em preparo", "Cancelado"],
       Aberto: ["Em preparo", "Cancelado"],
@@ -102,21 +141,28 @@ export default function AdminHistorico() {
       Entregue: [],
       Cancelado: [],
     };
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return map[atual] ?? [];
   }
 
+  // Declara função alterarStatusAdmin, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function alterarStatusAdmin(novoStatus: string) {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!pedidoAberto) return;
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!novoStatus || novoStatus === pedidoAberto.statusPedido) return;
     mover(pedidoAberto, novoStatus);
   }
 
+  // Declara função resumoItens, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   function resumoItens(pedido: Pedido) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return pedido.itens
       .map((it) => `${it.quantidade}x ${it.produto.nome}`)
       .join(", ");
   }
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <Layout>
       <h1>Histórico de pedidos</h1>
@@ -125,6 +171,7 @@ export default function AdminHistorico() {
         <div className="col-md-3 col-sm-6">
           <label className="form-label small d-block mb-1">Data</label>
           <input
+            // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
             type="date"
             className="form-control form-control-sm"
             value={filtroData}
@@ -271,6 +318,7 @@ export default function AdminHistorico() {
               Pedido Mesa {pedidoAberto.numeroMesa}
             </h5>
             <button
+              // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
               type="button"
               className="btn-close"
               aria-label="Fechar"
@@ -350,6 +398,7 @@ export default function AdminHistorico() {
             {pedidoAberto.statusPedido !== "Cancelado" &&
             pedidoAberto.statusPedido !== "Entregue" && (
               <button
+                // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
                 type="button"
                 className="btn btn-outline-secondary ms-2"
                 onClick={() => setPedidoAberto(null)}

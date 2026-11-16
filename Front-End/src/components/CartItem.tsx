@@ -1,6 +1,10 @@
+// Componente visual de uma linha do carrinho, conectando os dados do produto às ações de quantidade e remoção.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useState } from "react";
+// Importa uma regra ou utilitário local reutilizável; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { ItemCarrinho } from "../lib/carrinho";
 
+// Declara função CartItem, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export function CartItem({
   item,
   onAlterar,
@@ -10,8 +14,10 @@ export function CartItem({
   onAlterar: (idProduto: number, quantidade: number) => void;
   onRemover: (idProduto: number) => void;
 }) {
+  // Inicializa o estado local imagemErro, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [imagemErro, setImagemErro] = useState(false);
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <li className="list-group-item d-flex align-items-center gap-2">
       <div className="cart-item__img">

@@ -1,32 +1,37 @@
-# React + TypeScript + Vite
+# Front-end — Chic Dog
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicação web de pedidos do Chic Dog, desenvolvida com React, TypeScript e Vite. As instruções de configuração do banco, do back-end, dos usuários de demonstração e dos endpoints estão no [README principal](../README.md).
 
-Currently, two official plugins are available:
+## Pré-requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20.19 ou superior e npm.
+- Back-end em execução em `http://localhost:3333` para acessar os dados da aplicação.
 
-## React Compiler
+## Instalação e execução
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Na pasta `Front-End/`, instale as dependências e inicie o servidor de desenvolvimento:
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Abra `http://localhost:5173`. Durante o desenvolvimento, o proxy do Vite encaminha requisições com prefixo `/api` ao back-end.
+
+Para apontar o cliente a outra URL, configure `VITE_API_URL` no ambiente do Vite. Em produção, essa variável deve conter a URL base do back-end.
+
+## Scripts disponíveis
+
+Execute os comandos abaixo na pasta `Front-End/`:
+
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Inicia o servidor de desenvolvimento Vite |
+| `npm run build` | Executa a verificação TypeScript e gera a versão de produção |
+| `npm run preview` | Serve localmente a versão de produção gerada |
+| `npm run lint` | Analisa o código com Oxlint |
+| `npm test` | Executa os testes do front-end uma vez |
+
+## Acesso do tablet do cliente
+
+Abra uma URL como `http://localhost:5173/cliente?mesa=4` para configurar a mesa. No primeiro acesso, também é possível configurar a mesa pela tela correspondente. O número é armazenado no `localStorage` do navegador.
