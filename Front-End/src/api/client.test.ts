@@ -1,4 +1,7 @@
+// Testes do cliente HTTP: verificam a montagem de requisições e o tratamento de respostas e erros da API.
+// Importa as ferramentas de teste; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { afterEach, test, expect, vi } from "vitest";
+// Importa o módulo ./client, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { apiFetch, definirToken } from "./client";
 
 afterEach(() => {
@@ -7,6 +10,7 @@ afterEach(() => {
 });
 
 test("apiFetch envia o token e devolve o JSON", async () => {
+  // Declara valor fetchFalso, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const fetchFalso = vi.fn(async () =>
     new Response(JSON.stringify({ ok: true }), {
       status: 200,
@@ -18,7 +22,9 @@ test("apiFetch envia o token e devolve o JSON", async () => {
 
   await expect(apiFetch("/pedidos")).resolves.toEqual({ ok: true });
 
+  // Declara valor call, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const call = fetchFalso.mock.calls[0] as unknown as [unknown, { headers?: unknown }];
+  // Declara valor opcoes, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const opcoes = call[1];
   expect(new Headers(opcoes?.headers as HeadersInit).get("Authorization")).toBe("Bearer abc");
 });

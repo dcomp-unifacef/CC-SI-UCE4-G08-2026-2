@@ -1,42 +1,67 @@
+// Tela de pagamento: consulta pedido e notificações e conduz a solicitação e confirmação de pagamento.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useState, useEffect } from "react";
+// Importa o roteador React para navegação e acesso às rotas; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useNavigate, useLocation, useParams } from "react-router";
+// Importa o contexto compartilhado, que fornece estado e ações à tela; esses valores conectam a página ao AuthContext.
 import { useAuth } from "../../contexts/AuthContext";
+// Importa o módulo ../../api/notificacoes, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { solicitarPagamento } from "../../api/notificacoes";
+// Importa o módulo ../../api/client, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { apiFetch } from "../../api/client";
+// Importa um componente reutilizável da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { Layout } from "../../components/Layout";
+// Importa os contratos de dados usados entre interface e API; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { Pedido } from "../../types/api";
 
 // Código PIX de exemplo (apenas para testes - não é real)
 const CODIGO_PIX_EXEMPLO =
   "00020126580014br.gov.bcb.pix0136f8b8e5f5-4b0a-4c9d-8e7f-1234567890ab520400005303986540510.005802BR5925Cliente Exemplo6009SAO PAULO62070503***6304ABCD";
 
+// Declara função Pagamento, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export default function Pagamento() {
+  // Obtém as ações e os dados de usuário fornecidos pelo contexto global de autenticação.
   const { usuario } = useAuth();
+  // Declara valor navigate, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const navigate = useNavigate();
+  // Declara valor location, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const location = useLocation();
+  // Inicializa o estado local pedido, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [pedido, setPedido] = useState<Pedido | null>(null);
+  // Inicializa o estado local carregando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [carregando, setCarregando] = useState(true);
+  // Inicializa o estado local erro, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [erro, setErro] = useState<string | null>(null);
+  // Inicializa o estado local enviando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [enviando, setEnviando] = useState(false);
+  // Inicializa o estado local metodo, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [metodo, setMetodo] = useState<"PIX" | "CARTAO" | null>(null);
+  // Inicializa o estado local concluido, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [concluido, setConcluido] = useState(false);
 
   // Tenta obter o idPedido da query ou dos params
   const idPedidoUrl = new URLSearchParams(location.search).get("idPedido");
+  // Declara valor idPedidoParam, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const idPedidoParam = useParams()?.idPedido
     ? Number(useParams().idPedido)
     : null;
+  // Declara valor idPedido, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const idPedido = idPedidoUrl ? Number(idPedidoUrl) : idPedidoParam;
 
+  // Sincroniza efeitos externos (API, temporizadores ou navegação) com o ciclo de vida do componente.
   useEffect(() => {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!idPedido) {
       setErro("Pedido não informado.");
       setCarregando(false);
+      // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
       return;
     }
 
     (async () => {
+      // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
       try {
+        // Declara valor dados, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
         const dados = (await apiFetch<Pedido>(
           `/pedidos/${idPedido}`,
         )) as Pedido;
@@ -49,11 +74,14 @@ export default function Pagamento() {
     })();
   }, [idPedido]);
 
+  // Declara função confirmarPagamento, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function confirmarPagamento() {
+    // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
     if (!pedido || !metodo || !usuario) return;
     setEnviando(true);
     setErro(null);
 
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       // 1. Solicita pagamento (cria notificação para o garçom se for cartão)
       await solicitarPagamento({
@@ -82,7 +110,9 @@ export default function Pagamento() {
     }
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (carregando) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <Layout>
         <p>Carregando...</p>
@@ -90,7 +120,9 @@ export default function Pagamento() {
     );
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (!pedido) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <Layout>
         <div className="alert alert-danger">{erro ?? "Pedido não encontrado."}</div>
@@ -104,12 +136,15 @@ export default function Pagamento() {
     );
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (concluido) {
+    // Declara valor mensagem, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
     const mensagem =
       metodo === "PIX"
         ? "Pagamento via PIX registrado com sucesso!"
         : "Solicitação de pagamento no cartão enviada. O garçom foi notificado e levará a maquininha até sua mesa.";
 
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <Layout>
         <div className="text-center py-5">
@@ -131,7 +166,9 @@ export default function Pagamento() {
     );
   }
 
+  // Declara valor ehDono, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const ehDono = pedido.idCliente === usuario?.id;
+  // Declara valor podePagar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const podePagar = ehDono && !concluido;
 
   // URL do QR code para PIX (apenas para testes - não é funcional)
@@ -139,6 +176,7 @@ export default function Pagamento() {
     ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(CODIGO_PIX_EXEMPLO)}`
     : null;
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <Layout>
       <h1>Pagamento — Mesa {pedido.numeroMesa}</h1>

@@ -1,6 +1,10 @@
+/* Folha global: define paleta, tipografia, ajustes Bootstrap e estilos compartilhados pela interface Chic Dog. */
+/* Carrega recurso externo de tipografia que compõe a identidade visual compartilhada. */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+/* Carrega recurso externo de tipografia que compõe a identidade visual compartilhada. */
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 
+/* Aplica apresentação e layout ao seletor :root, complementando os componentes React que o utilizam. */
 :root {
   /* Paleta Chic Dog (Franca) — vermelho + amarelo */
   --cd-red: #c62828;
@@ -34,10 +38,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Aplica apresentação e layout ao seletor *, complementando os componentes React que o utilizam. */
 * {
   box-sizing: border-box;
 }
 
+/* Aplica apresentação e layout ao seletor body, complementando os componentes React que o utilizam. */
 body {
   margin: 0;
   min-height: 100vh;
@@ -49,6 +55,7 @@ body {
 }
 
 /* Camada parallax de profundidade (gradiente fixo) */
+/* Aplica apresentação e layout ao seletor body::before, complementando os componentes React que o utilizam. */
 body::before {
   content: "";
   position: fixed;
@@ -61,22 +68,26 @@ body::before {
 }
 
 main.container,
+/* Aplica apresentação e layout ao seletor main, complementando os componentes React que o utilizam. */
 main {
   background: transparent;
 }
 
+/* Aplica apresentação e layout ao seletor h1, h2, h3, h4, h5, h6, complementando os componentes React que o utilizam. */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--cd-dark);
 }
 
 /* Header */
+/* Aplica apresentação e layout ao seletor .cd-header, complementando os componentes React que o utilizam. */
 .cd-header {
   background: linear-gradient(135deg, var(--cd-red) 0%, var(--cd-red-dark) 100%);
   color: #fff;
   box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25);
 }
 
+/* Aplica apresentação e layout ao seletor .cd-header .brand, complementando os componentes React que o utilizam. */
 .cd-header .brand {
   font-weight: 800;
   font-size: 1.5rem;
@@ -84,6 +95,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Destaque da logo sobre o fundo vermelho do header */
+/* Aplica apresentação e layout ao seletor .cd-brand-badge, complementando os componentes React que o utilizam. */
 .cd-brand-badge {
   background: rgba(255, 255, 255, 0.92);
   padding: 4px 8px;
@@ -93,6 +105,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Navbar */
+/* Aplica apresentação e layout ao seletor .cd-nav, complementando os componentes React que o utilizam. */
 .cd-nav {
   background: #fff;
   border-bottom: 3px solid var(--cd-yellow);
@@ -100,6 +113,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Cards */
+/* Aplica apresentação e layout ao seletor .card, complementando os componentes React que o utilizam. */
 .card {
   border: none;
   border-radius: var(--bs-border-radius);
@@ -107,12 +121,14 @@ h1, h2, h3, h4, h5, h6 {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Aplica apresentação e layout ao seletor .card:hover, complementando os componentes React que o utilizam. */
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Buttons */
+/* Aplica apresentação e layout ao seletor .btn, complementando os componentes React que o utilizam. */
 .btn {
   border-radius: 999px;
   font-weight: 600;
@@ -120,41 +136,50 @@ h1, h2, h3, h4, h5, h6 {
   transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
+/* Aplica apresentação e layout ao seletor .btn:active, complementando os componentes React que o utilizam. */
 .btn:active {
   transform: scale(0.97);
 }
 
+/* Aplica apresentação e layout ao seletor .btn:hover, complementando os componentes React que o utilizam. */
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-primary:hover, complementando os componentes React que o utilizam. */
 .btn-primary:hover {
   background-color: var(--cd-red-dark);
   border-color: var(--cd-red-dark);
 }
 
 /* Animação de entrada suave para cards e itens */
+/* Organiza regras relacionadas em @keyframes fadeInUp, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes fadeInUp {
+/* Aplica apresentação e layout ao seletor from, complementando os componentes React que o utilizam. */
   from {
     opacity: 0;
     transform: translateY(12px);
   }
+/* Aplica apresentação e layout ao seletor to, complementando os componentes React que o utilizam. */
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/* Aplica apresentação e layout ao seletor .card, complementando os componentes React que o utilizam. */
 .card {
   animation: fadeInUp 0.35s ease both;
 }
 
+/* Aplica apresentação e layout ao seletor .list-group-item, complementando os componentes React que o utilizam. */
 .list-group-item {
   animation: fadeInUp 0.25s ease both;
 }
 
 /* Stagger: atraso em cascata nos filhos */
+/* Aplica apresentação e layout ao seletor .stagger > *, complementando os componentes React que o utilizam. */
 .stagger > * {
   animation: fadeInUp 0.4s ease both;
 }
@@ -167,11 +192,13 @@ h1, h2, h3, h4, h5, h6 {
 .stagger > *:nth-child(6) { animation-delay: 0.30s; }
 .stagger > *:nth-child(n+7) { animation-delay: 0.35s; }
 
+/* Aplica apresentação e layout ao seletor .alert, complementando os componentes React que o utilizam. */
 .alert {
   animation: fadeInUp 0.3s ease both;
 }
 
 /* Bounce ao clicar em "Adicionar" */
+/* Organiza regras relacionadas em @keyframes pop, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.12); }
@@ -179,36 +206,43 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn:active .bi,
+/* Aplica apresentação e layout ao seletor .btn:active, complementando os componentes React que o utilizam. */
 .btn:active {
   animation: pop 0.25s ease;
 }
 
 /* Hover em cards de produto */
+/* Aplica apresentação e layout ao seletor .card:hover .card-title, complementando os componentes React que o utilizam. */
 .card:hover .card-title {
   color: var(--cd-red);
   transition: color 0.2s ease;
 }
 
 /* Transições entre rotas */
+/* Aplica apresentação e layout ao seletor .route-fade-in, complementando os componentes React que o utilizam. */
 .route-fade-in {
   animation: routeFadeIn 0.25s ease both;
 }
 
+/* Aplica apresentação e layout ao seletor .route-fade-out, complementando os componentes React que o utilizam. */
 .route-fade-out {
   animation: routeFadeOut 0.12s ease both;
 }
 
+/* Organiza regras relacionadas em @keyframes routeFadeIn, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes routeFadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Organiza regras relacionadas em @keyframes routeFadeOut, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes routeFadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
 }
 
 /* Hot dog 3D flutuante no fundo */
+/* Aplica apresentação e layout ao seletor .hotdog3d, complementando os componentes React que o utilizam. */
 .hotdog3d {
   position: fixed;
   right: 2%;
@@ -224,6 +258,7 @@ h1, h2, h3, h4, h5, h6 {
   transform-origin: bottom right;
 }
 
+/* Aplica apresentação e layout ao seletor .hotdog3d__title, complementando os componentes React que o utilizam. */
 .hotdog3d__title {
   font-family: "Pacifico", cursive;
   font-size: 2.6rem;
@@ -237,17 +272,21 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
+/* Aplica apresentação e layout ao seletor .hotdog3d-canvas, complementando os componentes React que o utilizam. */
 .hotdog3d-canvas {
   opacity: 0.85;
   filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.25));
 }
 
+/* Organiza regras relacionadas em @keyframes titleWiggle, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes titleWiggle {
   0%, 100% { transform: rotate(-2deg); }
   50% { transform: rotate(2deg); }
 }
 
+/* Organiza regras relacionadas em @media (max-width: 768px), mantendo o comportamento responsivo ou de animação da interface. */
 @media (max-width: 768px) {
+/* Aplica apresentação e layout ao seletor .hotdog3d, complementando os componentes React que o utilizam. */
   .hotdog3d {
     right: 2%;
     bottom: 4%;
@@ -256,17 +295,21 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Organiza regras relacionadas em @keyframes hotdogFloat, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes hotdogFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
 }
 
+/* Organiza regras relacionadas em @keyframes hotdogRotate, mantendo o comportamento responsivo ou de animação da interface. */
 @keyframes hotdogRotate {
   0% { transform: rotateY(0deg) rotateX(8deg); }
   100% { transform: rotateY(360deg) rotateX(8deg); }
 }
 
+/* Organiza regras relacionadas em @media (max-width: 768px), mantendo o comportamento responsivo ou de animação da interface. */
 @media (max-width: 768px) {
+/* Aplica apresentação e layout ao seletor .hotdog3d, complementando os componentes React que o utilizam. */
   .hotdog3d {
     right: 2%;
     bottom: 4%;
@@ -276,6 +319,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Hero impactante */
+/* Aplica apresentação e layout ao seletor .cd-hero, complementando os componentes React que o utilizam. */
 .cd-hero {
   background: linear-gradient(135deg, var(--cd-red) 0%, var(--cd-red-dark) 60%, #5a0000 100%);
   color: #fff;
@@ -286,6 +330,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 12px 30px rgba(198, 40, 40, 0.35);
 }
 
+/* Aplica apresentação e layout ao seletor .cd-hero::before, complementando os componentes React que o utilizam. */
 .cd-hero::before {
   content: "🌭";
   position: absolute;
@@ -296,6 +341,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: rotate(-15deg);
 }
 
+/* Aplica apresentação e layout ao seletor .cd-hero__title, complementando os componentes React que o utilizam. */
 .cd-hero__title {
   font-size: clamp(1.6rem, 4vw, 2.6rem);
   font-weight: 800;
@@ -303,6 +349,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.1;
 }
 
+/* Aplica apresentação e layout ao seletor .cd-hero__subtitle, complementando os componentes React que o utilizam. */
 .cd-hero__subtitle {
   opacity: 0.9;
   margin: 0.5rem 0 1.25rem;
@@ -310,6 +357,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* CTA com gradiente */
+/* Aplica apresentação e layout ao seletor .cd-cta, complementando os componentes React que o utilizam. */
 .cd-cta {
   background: linear-gradient(135deg, var(--cd-yellow) 0%, var(--cd-yellow-dark) 100%);
   color: var(--cd-dark);
@@ -319,6 +367,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 18px rgba(255, 193, 7, 0.4);
 }
 
+/* Aplica apresentação e layout ao seletor .cd-cta:hover, complementando os componentes React que o utilizam. */
 .cd-cta:hover {
   color: var(--cd-dark);
   transform: translateY(-3px);
@@ -326,6 +375,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Cards de produto */
+/* Aplica apresentação e layout ao seletor .product-card__img, complementando os componentes React que o utilizam. */
 .product-card__img {
   text-align: center;
   padding: 1rem 0 0.5rem;
@@ -338,20 +388,24 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid #f0f0f0;
 }
 
+/* Aplica apresentação e layout ao seletor .product-card__img img, complementando os componentes React que o utilizam. */
 .product-card__img img {
   max-width: 100%;
   max-height: 100%;
   object-fit: cover;
 }
 
+/* Aplica apresentação e layout ao seletor .product-card__img .product-card__emoji, complementando os componentes React que o utilizam. */
 .product-card__img .product-card__emoji {
   font-size: 3.5rem;
 }
 
+/* Aplica apresentação e layout ao seletor .product-card:hover .product-card__img, complementando os componentes React que o utilizam. */
 .product-card:hover .product-card__img {
   transform: scale(1.15) rotate(-5deg);
 }
 
+/* Aplica apresentação e layout ao seletor .cart-item__img, complementando os componentes React que o utilizam. */
 .cart-item__img {
   width: 56px;
   height: 56px;
@@ -365,59 +419,70 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
 }
 
+/* Aplica apresentação e layout ao seletor .cart-item__img img, complementando os componentes React que o utilizam. */
 .cart-item__img img {
   max-width: 100%;
   max-height: 100%;
   object-fit: cover;
 }
 
+/* Aplica apresentação e layout ao seletor .cart-item__img .product-card__emoji, complementando os componentes React que o utilizam. */
 .cart-item__img .product-card__emoji {
   font-size: 1.5rem;
 }
 
 /* Transição suave em inputs */
 .form-control,
+/* Aplica apresentação e layout ao seletor .form-select, complementando os componentes React que o utilizam. */
 .form-select {
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 .form-control:focus,
+/* Aplica apresentação e layout ao seletor .form-select:focus, complementando os componentes React que o utilizam. */
 .form-select:focus {
   transform: translateY(-1px);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-primary, complementando os componentes React que o utilizam. */
 .btn-primary {
   background-color: var(--cd-red);
   border-color: var(--cd-red);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-primary:hover, complementando os componentes React que o utilizam. */
 .btn-primary:hover {
   background-color: var(--cd-red-dark);
   border-color: var(--cd-red-dark);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-warning, complementando os componentes React que o utilizam. */
 .btn-warning {
   background-color: var(--cd-yellow);
   border-color: var(--cd-yellow);
   color: var(--cd-dark);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-warning:hover, complementando os componentes React que o utilizam. */
 .btn-warning:hover {
   background-color: var(--cd-yellow-dark);
   border-color: var(--cd-yellow-dark);
   color: #fff;
 }
 
+/* Aplica apresentação e layout ao seletor .btn-success, complementando os componentes React que o utilizam. */
 .btn-success {
   background-color: var(--cd-red);
   border-color: var(--cd-red);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-outline-primary, complementando os componentes React que o utilizam. */
 .btn-outline-primary {
   color: var(--cd-red);
   border-color: var(--cd-red);
 }
 
+/* Aplica apresentação e layout ao seletor .btn-outline-primary:hover, complementando os componentes React que o utilizam. */
 .btn-outline-primary:hover {
   background-color: var(--cd-red);
   border-color: var(--cd-red);
@@ -425,6 +490,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Badges */
+/* Aplica apresentação e layout ao seletor .badge, complementando os componentes React que o utilizam. */
 .badge {
   border-radius: 999px;
   padding: 0.35em 0.75em;
@@ -432,30 +498,36 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Alerts */
+/* Aplica apresentação e layout ao seletor .alert, complementando os componentes React que o utilizam. */
 .alert {
   border: none;
   border-radius: var(--bs-border-radius);
   border-left: 4px solid;
 }
 
+/* Aplica apresentação e layout ao seletor .alert-danger, complementando os componentes React que o utilizam. */
 .alert-danger {
   border-left-color: var(--cd-red);
 }
 
+/* Aplica apresentação e layout ao seletor .alert-warning, complementando os componentes React que o utilizam. */
 .alert-warning {
   border-left-color: var(--cd-yellow);
 }
 
+/* Aplica apresentação e layout ao seletor .alert-info, complementando os componentes React que o utilizam. */
 .alert-info {
   border-left-color: var(--cd-red-light);
 }
 
+/* Aplica apresentação e layout ao seletor .alert-success, complementando os componentes React que o utilizam. */
 .alert-success {
   border-left-color: var(--cd-success, #2e7d32);
 }
 
 /* Forms */
 .form-control,
+/* Aplica apresentação e layout ao seletor .form-select, complementando os componentes React que o utilizam. */
 .form-select {
   border-radius: var(--bs-border-radius-sm);
   border: 1.5px solid #e0e0e0;
@@ -464,12 +536,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .form-control:focus,
+/* Aplica apresentação e layout ao seletor .form-select:focus, complementando os componentes React que o utilizam. */
 .form-select:focus {
   border-color: var(--cd-red);
   box-shadow: 0 0 0 0.2rem rgba(198, 40, 40, 0.15);
 }
 
 /* List group */
+/* Aplica apresentação e layout ao seletor .list-group-item, complementando os componentes React que o utilizam. */
 .list-group-item {
   border: none;
   border-bottom: 1px solid #f0f0f0;
@@ -477,26 +551,31 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Container */
+/* Aplica apresentação e layout ao seletor .container, complementando os componentes React que o utilizam. */
 .container {
   max-width: 1200px;
 }
 
 /* Utility */
+/* Aplica apresentação e layout ao seletor .cd-accent, complementando os componentes React que o utilizam. */
 .cd-accent {
   color: var(--cd-yellow);
 }
 
+/* Aplica apresentação e layout ao seletor .cursor-pointer, complementando os componentes React que o utilizam. */
 .cursor-pointer {
   cursor: pointer;
 }
 
 
 
+/* Aplica apresentação e layout ao seletor .cd-title, complementando os componentes React que o utilizam. */
 .cd-title {
   position: relative;
   display: inline-block;
 }
 
+/* Aplica apresentação e layout ao seletor .cd-title::after, complementando os componentes React que o utilizam. */
 .cd-title::after {
   content: "";
   position: absolute;
@@ -509,17 +588,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive tweaks */
+/* Organiza regras relacionadas em @media (max-width: 768px), mantendo o comportamento responsivo ou de animação da interface. */
 @media (max-width: 768px) {
+/* Aplica apresentação e layout ao seletor h1, complementando os componentes React que o utilizam. */
   h1 {
     font-size: 1.5rem;
   }
+/* Aplica apresentação e layout ao seletor .btn, complementando os componentes React que o utilizam. */
   .btn {
     padding: 0.45rem 1rem;
     font-size: 0.9rem;
   }
 }
 
+/* Organiza regras relacionadas em @media (max-width: 576px), mantendo o comportamento responsivo ou de animação da interface. */
 @media (max-width: 576px) {
+/* Aplica apresentação e layout ao seletor .container, complementando os componentes React que o utilizam. */
   .container {
     padding-left: 1rem;
     padding-right: 1rem;

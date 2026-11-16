@@ -1,3 +1,4 @@
+-- Remove temporariamente as relações antigas para permitir ajustar a nulabilidade.
 -- DropForeignKey
 ALTER TABLE "pedido" DROP CONSTRAINT "pedido_idCliente_fkey";
 
@@ -5,19 +6,24 @@ ALTER TABLE "pedido" DROP CONSTRAINT "pedido_idCliente_fkey";
 ALTER TABLE "pedido" DROP CONSTRAINT "pedido_idGarcom_fkey";
 
 -- AlterTable: adiciona a coluna como opcional para permitir o backfill
+-- Adiciona a mesa inicialmente como opcional para preencher pedidos já existentes.
 ALTER TABLE "pedido" ADD COLUMN "numeroMesa" INTEGER;
 
 -- Backfill: pedidos antigos ficam na mesa 1
+-- Atribui a mesa 1 aos pedidos existentes que ainda não possuem número de mesa.
 UPDATE "pedido" SET "numeroMesa" = 1 WHERE "numeroMesa" IS NULL;
 
+-- Exige a mesa em todos os pedidos futuros e permite pedidos sem cliente/garçom associado.
 ALTER TABLE "pedido" ALTER COLUMN "numeroMesa" SET NOT NULL;
 ALTER TABLE "pedido" ALTER COLUMN "idCliente" DROP NOT NULL;
 ALTER TABLE "pedido" ALTER COLUMN "idGarcom" DROP NOT NULL;
 
 -- Garante no banco um único pedido ativo por mesa
+-- Impede pedidos ativos simultâneos para uma mesma mesa; os estados finais são excluídos.
 CREATE UNIQUE INDEX "unq_pedido_mesa_ativo" ON "pedido"("numeroMesa")
 WHERE "statusPedido" NOT IN ('Pago', 'Cancelado');
 
+-- Recria as relações opcionais e define que exclusões de usuários limpam a referência.
 -- AddForeignKey
 ALTER TABLE "pedido" ADD CONSTRAINT "pedido_idCliente_fkey" FOREIGN KEY ("idCliente") REFERENCES "usuario"("idUsuario") ON DELETE SET NULL ON UPDATE NO ACTION;
 

@@ -1,4 +1,6 @@
 ﻿import { prisma } from "../database/client";
+// Cliente Prisma usado pelo serviço de usuários para consultas e alterações persistentes.
+// DTOs definem os campos graváveis que o usuarioService validou.
 import { CreateUsuarioDto } from "../dto/usuario/createUsuarioDto";
 import { UpdateUsuarioDto } from "../dto/usuario/updateUsuarioDto";
 
@@ -12,6 +14,7 @@ const publicSelect = {
   tipoUsuario: { select: { nome: true } },
 } as const;
 
+// Lista usuários sem retornar hashes de senha e com nome do perfil para exibição.
 function findAll() {
   return prisma.usuario.findMany({
     select: publicSelect,
@@ -19,6 +22,7 @@ function findAll() {
   });
 }
 
+// Consulta usuário por chave primária usando projeção pública segura.
 function findById(idUsuario: number) {
   return prisma.usuario.findUnique({
     where: { idUsuario },
@@ -26,6 +30,7 @@ function findById(idUsuario: number) {
   });
 }
 
+// Confere unicidade do login sem carregar credenciais sensíveis.
 function findByLogin(loginUsuario: string) {
   return prisma.usuario.findUnique({
     where: { loginUsuario },
@@ -33,6 +38,7 @@ function findByLogin(loginUsuario: string) {
   });
 }
 
+// Verifica existência de perfil pelo ID antes de criar/atualizar usuário.
 function findTipoUsuarioById(idTipoUsuario: number) {
   return prisma.tipoUsuario.findUnique({
     where: { idTipoUsuario },
@@ -40,6 +46,7 @@ function findTipoUsuarioById(idTipoUsuario: number) {
   });
 }
 
+// Cria usuário com senha já processada pelo service e devolve somente campos públicos.
 function create(data: CreateUsuarioDto & { senha: string; statusUsuario: boolean }) {
   return prisma.usuario.create({
     data,
@@ -47,6 +54,7 @@ function create(data: CreateUsuarioDto & { senha: string; statusUsuario: boolean
   });
 }
 
+// Atualiza usuário e conserva a projeção sem senha na resposta.
 function update(idUsuario: number, data: UpdateUsuarioDto) {
   return prisma.usuario.update({
     where: { idUsuario },
@@ -56,6 +64,7 @@ function update(idUsuario: number, data: UpdateUsuarioDto) {
 }
 
 // Desativar preserva pedidos que apontam para este usuário por chave estrangeira.
+// Atualiza estado de atividade em vez de apagar o registro relacionado.
 function deactivate(idUsuario: number) {
   return prisma.usuario.update({
     where: { idUsuario },
@@ -64,6 +73,7 @@ function deactivate(idUsuario: number) {
   });
 }
 
+// Exporta métodos que compõem a camada de persistência chamada por usuarioService.
 export default {
   findAll,
   findById,

@@ -1,18 +1,26 @@
+// Carrega as credenciais e configurações declaradas no arquivo .env.
 import "dotenv/config";
+// Adaptador PostgreSQL usado pelo Prisma Client para abrir conexões com o banco.
 import { PrismaPg } from "@prisma/adapter-pg";
+// Cliente tipado que oferece acesso aos modelos de prisma/schema.prisma.
 import { PrismaClient } from "@prisma/client";
+// Função de hash usada para nunca persistir senhas de seed em texto puro.
 import { hash } from "bcryptjs";
 
+// Obtém a URL configurada pelo ambiente para conectar ao banco de dados.
 const connectionString = process.env.DATABASE_URL;
 
+// Interrompe o seed com erro explícito quando falta a configuração obrigatória.
 if (!connectionString) {
   throw new Error("A variável DATABASE_URL não foi definida.");
 }
 
+// Inicializa o cliente Prisma com o adaptador de PostgreSQL e a URL validada.
 const prisma = new PrismaClient({
   adapter: new PrismaPg(connectionString),
 });
 
+// Procura o perfil pelo nome e cria-o apenas quando ainda não existe.
 async function garantirTipoUsuario(nome: string) {
   const existente = await prisma.tipoUsuario.findFirst({ where: { nome } });
 
@@ -23,6 +31,7 @@ async function garantirTipoUsuario(nome: string) {
   return prisma.tipoUsuario.create({ data: { nome } });
 }
 
+// Cria ou atualiza um usuário pelo login para que execuções repetidas sejam seguras.
 async function garantirUsuario(
   loginUsuario: string,
   nome: string,
@@ -46,6 +55,7 @@ async function garantirUsuario(
   });
 }
 
+// Mantém os produtos de exemplo atualizados sem duplicá-los pelo nome.
 async function garantirProduto(
   nome: string,
   preco: number,
@@ -67,12 +77,15 @@ async function garantirProduto(
   });
 }
 
+// Coordena a carga inicial de perfis, contas de acesso e produtos do catálogo.
 async function main() {
+  // Garante os quatro perfis que a aplicação usa para separar as telas e permissões.
   const tipoAdministrador = await garantirTipoUsuario("Administrador");
   const tipoGarcom = await garantirTipoUsuario("Garçom");
   const tipoCozinheiro = await garantirTipoUsuario("Cozinheiro");
   const tipoCliente = await garantirTipoUsuario("Cliente");
 
+  // Cria ou atualiza contas de demonstração usando variáveis ou valores padrão.
   const admin = await garantirUsuario(
     process.env.SEED_ADMIN_LOGIN ?? "admin",
     process.env.SEED_ADMIN_NOME ?? "Administrador",
@@ -101,6 +114,7 @@ async function main() {
     tipoCozinheiro.idTipoUsuario,
   );
 
+  // Catálogo de demonstração consumido pela API de produtos e pela interface.
   const produtos = [
     {
       nome: "Cachorro-quente",
@@ -146,6 +160,7 @@ async function main() {
     },
   ];
 
+  // Persiste cada produto por meio da função idempotente acima.
   for (const produto of produtos) {
     await garantirProduto(
       produto.nome,
@@ -156,16 +171,20 @@ async function main() {
     );
   }
 
+  // Exibe os logins criados para facilitar a conferência da carga inicial.
   console.log(
     `Seed concluído. Admin: ${admin.loginUsuario}, cliente: ${cliente.loginUsuario}, garçom: ${garcom.loginUsuario}, cozinheiro: ${cozinheiro.loginUsuario}.`,
   );
 }
 
+// Executa a carga, registra falhas e sempre encerra a conexão com o banco.
 main()
   .catch((error) => {
+    // Mostra a causa da falha e sinaliza ao processo que a execução não foi bem-sucedida.
     console.error(error);
     process.exitCode = 1;
   })
   .finally(async () => {
+    // Libera o pool de conexões independentemente do resultado do seed.
     await prisma.$disconnect();
   });

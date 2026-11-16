@@ -1,7 +1,12 @@
+// Cartão de produto reutilizável para apresentar dados do catálogo e iniciar ações de seleção.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useState } from "react";
+// Importa os contratos de dados usados entre interface e API; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { Produto } from "../types/api";
+// Importa uma regra ou utilitário local reutilizável; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { resolverImagem } from "../lib/imagens";
 
+// Declara função ProductCard, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export function ProductCard({
   produto,
   onAdicionar,
@@ -11,9 +16,12 @@ export function ProductCard({
   onAdicionar: (produto: Produto) => void;
   disabled?: boolean;
 }) {
+  // Inicializa o estado local imagemErro, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [imagemErro, setImagemErro] = useState(false);
+  // Declara valor imagemSrc, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const imagemSrc = resolverImagem(produto.nome, produto.imagem);
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <div className="card h-100 product-card">
       <div className="product-card__img">

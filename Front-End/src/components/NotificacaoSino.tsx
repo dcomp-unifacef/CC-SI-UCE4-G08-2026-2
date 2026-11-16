@@ -1,28 +1,45 @@
+// Sino de notificações: consulta avisos da API, atualiza contagens e oferece ações na interface.
+// Importa as primitivas React usadas para estado, efeitos e composição da interface; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useState, useEffect } from "react";
+// Importa o roteador React para navegação e acesso às rotas; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { useNavigate } from "react-router";
+// Importa o adaptador de API responsável pela comunicação com o servidor; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import {
   listarNotificacoesPendentes,
   contarNaoLidas,
   marcarComoAtendida,
   marcarComoLida,
 } from "../api/notificacoes";
+// Importa os contratos de dados usados entre interface e API; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import type { NotificacaoPagamento } from "../types/api";
 
+// Declara função NotificacaoSino, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export function NotificacaoSino() {
+  // Declara valor navigate, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   const navigate = useNavigate();
+  // Inicializa o estado local naoLidas, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [naoLidas, setNaoLidas] = useState(0);
+  // Inicializa o estado local aberta, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [aberta, setAberta] = useState(false);
+  // Inicializa o estado local notificacoes, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [notificacoes, setNotificacoes] = useState<NotificacaoPagamento[]>([]);
+  // Inicializa o estado local carregando, que o componente atualiza para refletir os dados e as interacoes do usuario.
   const [carregando, setCarregando] = useState(true);
 
+  // Sincroniza efeitos externos (API, temporizadores ou navegação) com o ciclo de vida do componente.
   useEffect(() => {
     carregar();
+    // Declara valor intervalo, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
     const intervalo = setInterval(carregar, 5000);
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return () => clearInterval(intervalo);
   }, []);
 
+  // Declara função carregar, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function carregar() {
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
+      // Define a exportação pública deste módulo para integração com as demais partes da aplicação.
       const [{ naoLidas: n }, lista] = await Promise.all([
         contarNaoLidas(),
         listarNotificacoesPendentes(),
@@ -36,7 +53,9 @@ export function NotificacaoSino() {
     }
   }
 
+  // Declara função atender, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function atender(id: number) {
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       await marcarComoAtendida(id);
       await carregar();
@@ -45,7 +64,9 @@ export function NotificacaoSino() {
     }
   }
 
+  // Declara função ler, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   async function ler(id: number) {
+    // Executa a operação sujeita a falhas, como uma chamada à API ou interação com o navegador.
     try {
       await marcarComoLida(id);
       await carregar();
@@ -54,7 +75,9 @@ export function NotificacaoSino() {
     }
   }
 
+  // Declara função formatarHora, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
   function formatarHora(dataHora: string): string {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return new Date(dataHora).toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -64,7 +87,9 @@ export function NotificacaoSino() {
     });
   }
 
+  // Verifica a condição do fluxo para decidir se os dados e a navegação devem seguir por este ramo.
   if (carregando) {
+    // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
     return (
       <button className="btn btn-outline-dark position-relative" disabled>
         <span className="visually-hidden">Notificações de pagamento</span>
@@ -75,6 +100,7 @@ export function NotificacaoSino() {
     );
   }
 
+  // Retorna o resultado/renderização desta etapa ao componente ou chamador que coordena o fluxo.
   return (
     <div className="dropdown position-relative d-inline-block">
       <button

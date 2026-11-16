@@ -1,4 +1,7 @@
+// Testes das regras locais de perfil, acesso às rotas e destino inicial após autenticação.
+// Importa as ferramentas de teste; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { expect, test } from "vitest";
+// Importa o módulo ./auth, que fornece dependências usadas neste arquivo; os símbolos trazidos são utilizados pelo módulo descrito no cabeçalho.
 import { podeAcessarRota, rotaInicialPorTipo } from "./auth";
 
 test("cada perfil cai na sua rota inicial", () => {

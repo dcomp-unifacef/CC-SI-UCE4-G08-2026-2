@@ -1,3 +1,5 @@
+// Contratos TypeScript dos dados trocados entre as telas, adaptadores de API e servidor.
+// Declara contrato de dados UsuarioLogado, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface UsuarioLogado {
   id: number;
   nome: string;
@@ -5,11 +7,13 @@ export interface UsuarioLogado {
   tipo: string;
 }
 
+// Declara contrato de dados RespostaLogin, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface RespostaLogin {
   usuario: UsuarioLogado;
   token: string;
 }
 
+// Declara contrato de dados UsuarioApi, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface UsuarioApi {
   idUsuario: number;
   nome: string;
@@ -19,6 +23,7 @@ export interface UsuarioApi {
   tipoUsuario: { nome: string };
 }
 
+// Declara contrato de dados Produto, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface Produto {
   idProduto: number;
   nome: string;
@@ -28,6 +33,7 @@ export interface Produto {
   disponivel: boolean;
 }
 
+// Declara contrato de dados ItemPedido, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface ItemPedido {
   idItemPedido: number;
   idPedido: number;
@@ -43,6 +49,7 @@ export interface ItemPedido {
   };
 }
 
+// Declara contrato de dados Pedido, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface Pedido {
   idPedido: number;
   valorTotal: string;
@@ -58,10 +65,12 @@ export interface Pedido {
   pagamento: unknown;
 }
 
+// Declara contrato de dados CancelarPedidoInput, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface CancelarPedidoInput {
   motivo: string;
 }
 
+// Declara contrato de dados NotificacaoPagamento, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface NotificacaoPagamento {
   idNotificacao: number;
   idPedido: number;
@@ -72,20 +81,24 @@ export interface NotificacaoPagamento {
   lida: boolean;
 }
 
+// Declara contrato de dados SolicitarPagamentoInput, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface SolicitarPagamentoInput {
   idPedido: number;
   metodoPagamento: "PIX" | "CARTAO";
 }
 
+// Declara contrato de dados ContarNaoLidasResponse, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface ContarNaoLidasResponse {
   naoLidas: number;
 }
 
+// Declara contrato de dados ItemInput, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface ItemInput {
   idProduto: number;
   quantidade: number;
 }
 
+// Declara contrato de dados CriarPedidoInput, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface CriarPedidoInput {
   numeroMesa: number;
   idGarcom?: number;
@@ -94,6 +107,7 @@ export interface CriarPedidoInput {
   itens: ItemInput[];
 }
 
+// Declara contrato de dados AtualizarPedidoInput, que implementa ou representa uma parte deste módulo e é consumida pelo fluxo da interface/API descrito acima.
 export interface AtualizarPedidoInput {
   statusPedido?: string;
   idCliente?: number;

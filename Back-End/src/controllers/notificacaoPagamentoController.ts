@@ -1,7 +1,11 @@
+// Tipos de requisição, resposta e continuação do Express para os handlers HTTP.
 import { NextFunction, Request, Response } from "express";
+// Service executa as regras de notificação e acessa o repository/Prisma.
 import service from "../services/notificacaoPagamentoService";
+// Erros de entrada devem chegar ao middleware de erros em app.ts.
 import { AppError } from "../errors/AppError";
 
+// Converte o ID da URL para inteiro positivo antes da operação de domínio.
 function parseId(raw: unknown): number {
   if (typeof raw !== "string") {
     throw new AppError("O id deve ser um inteiro positivo.", 400);
@@ -16,6 +20,7 @@ function parseId(raw: unknown): number {
   return id;
 }
 
+// Recebe solicitação de pagamento, persiste via service e devolve o registro criado.
 export async function criar(
   req: Request,
   res: Response,
@@ -29,6 +34,7 @@ export async function criar(
   }
 }
 
+// Lista notificações que a equipe ainda precisa atender.
 export async function listarPendentes(
   _req: Request,
   res: Response,
@@ -41,6 +47,7 @@ export async function listarPendentes(
   }
 }
 
+// Retorna o total pendente de leitura para atualizar o indicador do front-end.
 export async function contarNaoLidas(
   _req: Request,
   res: Response,
@@ -53,6 +60,7 @@ export async function contarNaoLidas(
   }
 }
 
+// Registra atendimento da notificação identificada.
 export async function marcarComoAtendida(
   req: Request,
   res: Response,
@@ -68,6 +76,7 @@ export async function marcarComoAtendida(
   }
 }
 
+// Marca como lida a notificação identificada para remover do contador.
 export async function marcarComoLida(
   req: Request,
   res: Response,
